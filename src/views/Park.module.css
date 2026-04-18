@@ -1,26 +1,59 @@
 .container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #A5F3FC 0%, #BAE6FD 40%, #BBF7D0 100%);
+}
+
+.content {
+  position: relative;
+  z-index: 10;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: clamp(20px, 5vw, 60px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  align-items: center;
-  justify-content: center; /* Center content vertically if it fits */
 }
 
 .header {
   text-align: center;
   margin-bottom: clamp(20px, 4vh, 60px);
-  width: 100%;
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .title {
   font-size: clamp(40px, 8vw, 80px);
-  color: var(--color-primary);
-  text-shadow: 4px 4px 0 rgba(0, 0, 0, 0.05);
-  line-height: 1.2;
+  color: #0369A1;
+  text-shadow: 4px 4px 0 rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+.subtitle {
+  font-size: clamp(24px, 4vw, 32px);
+  color: #075985;
+  margin: 10px 0 0;
+  font-weight: 700;
+}
+
+.emojiLeft, .emojiRight {
+  font-size: clamp(30px, 6vw, 60px);
+  animation: float 3s infinite ease-in-out;
+}
+
+.emojiRight {
+  animation-delay: 1.5s;
 }
 
 .grid {
@@ -30,29 +63,132 @@
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+  padding-bottom: 100px; /* Space for pets */
 }
 
-/* Tablet Landscape and larger */
+/* Sky Decorations */
+.sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 40%;
+  pointer-events: none;
+}
+
+.sun {
+  position: absolute;
+  top: 40px;
+  right: 10%;
+  font-size: clamp(60px, 10vw, 120px);
+  animation: pulse 4s infinite ease-in-out;
+}
+
+.cloud {
+  position: absolute;
+  font-size: 80px;
+  opacity: 0.8;
+  animation: moveCloud 20s infinite linear;
+}
+
+.cloud1 { top: 10%; left: -100px; animation-duration: 30s; }
+.cloud2 { top: 25%; left: -150px; animation-duration: 45s; animation-delay: 5s; }
+
+.bird {
+  position: absolute;
+  top: 15%;
+  right: -50px;
+  font-size: 40px;
+  animation: moveBird 15s infinite linear;
+}
+
+/* Nature Decorations */
+.nature {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.grass {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #4ADE80;
+  border-radius: 100% 100% 0 0 / 20% 20% 0 0;
+}
+
+.butterfly {
+  position: absolute;
+  bottom: 100px;
+  left: 10%;
+  font-size: 40px;
+  animation: fly 8s infinite ease-in-out;
+}
+
+.butterfly2 {
+  left: auto;
+  right: 15%;
+  animation-duration: 11s;
+  animation-delay: 2s;
+}
+
+.flowers {
+  position: absolute;
+  bottom: 20px;
+  left: 5%;
+  font-size: 30px;
+}
+
+.pets {
+  position: absolute;
+  bottom: 10px;
+  right: 5%;
+  font-size: 50px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+@keyframes moveCloud {
+  from { transform: translateX(-100px); }
+  to { transform: translateX(calc(100vw + 200px)); }
+}
+
+@keyframes moveBird {
+  from { transform: translateX(0) translateY(0); }
+  to { transform: translateX(calc(-100vw - 100px)) translateY(20px); }
+}
+
+@keyframes fly {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(50px, -30px) rotate(10deg); }
+  50% { transform: translate(100px, 0px) rotate(-10deg); }
+  75% { transform: translate(50px, 30px) rotate(5deg); }
+}
+
+/* Responsivity */
 @media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Very wide screens */
-@media (min-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 50px;
-  }
-}
-
-/* Mobile Portrait / Small Tablets */
 @media (max-width: 600px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .title {
-    font-size: 40px;
-  }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .title { font-size: 40px; }
+  .subtitle { font-size: 20px; }
+  .pets { font-size: 30px; }
 }

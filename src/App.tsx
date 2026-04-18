@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import Park from './views/Park';
 import BubblePop from './views/BubblePop';
+import MemoryGame from './views/MemoryGame';
+import ShapesGame from './views/ShapesGame';
+import FeedingGame from './views/FeedingGame';
+import MassinhaGame from './views/MassinhaGame';
+import NumbersGame from './views/NumbersGame';
+import BackgroundMusic from './components/BackgroundMusic';
 
 function App() {
   const [activeGame, setActiveGame] = useState<string | null>(null);
@@ -17,6 +23,16 @@ function App() {
     switch (activeGame) {
       case 'bolhas':
         return <BubblePop />;
+      case 'memoria':
+        return <MemoryGame />;
+      case 'formas':
+        return <ShapesGame />;
+      case 'comida':
+        return <FeedingGame />;
+      case 'massinha':
+        return <MassinhaGame />;
+      case 'numeros':
+        return <NumbersGame />;
       default:
         return (
           <div style={{ 
@@ -35,11 +51,12 @@ function App() {
 
   return (
     <div className="app-container">
+      <BackgroundMusic />
       {!activeGame ? (
         <Park onSelectGame={handleSelectGame} />
       ) : (
         <div className="game-wrapper">
-          <header style={{ padding: '20px', position: 'absolute', top: 0, left: 0, zIndex: 10 }}>
+          <header style={{ padding: '20px', position: 'absolute', top: 0, left: 0, zIndex: 100 }}>
             <button 
               className="bouncy-tap"
               onClick={handleBackToPark}
