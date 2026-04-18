@@ -1,0 +1,72 @@
+@import "@fontsource/fredoka/400.css";
+@import "@fontsource/fredoka/700.css";
+
+:root {
+  --color-primary: #FFCF00; /* Sunny Yellow */
+  --color-secondary: #FF6B6B; /* Soft Red */
+  --color-accent: #4ECDC4; /* Mint Blue */
+  --color-bg: #F7FFF7; /* Off White */
+  --color-text: #2F2F2F;
+  --color-white: #FFFFFF;
+  --font-main: 'Fredoka', sans-serif;
+  --radius-lg: 40px;
+  --radius-md: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevent scrolling on iPad */
+  font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* Ensure iPad safe areas are respected */
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+h1, h2, h3 {
+  font-weight: 700;
+  margin: 0;
+}
+
+button {
+  font-family: var(--font-main);
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+.app-container, .game-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bouncy Animation for all interactive elements */
+.bouncy-tap {
+  transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.bouncy-tap:active {
+  transform: scale(0.9);
+}

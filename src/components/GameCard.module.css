@@ -1,0 +1,27 @@
+.card {
+  width: 100%;
+  aspect-ratio: 1 / 1.1;
+  background-color: var(--card-color);
+  border: 8px solid var(--color-white);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-shadow: 0 12px 0 rgba(0, 0, 0, 0.1);
+  gap: 10px;
+}
+
+.icon {
+  font-size: 80px;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.1));
+}
+
+.title {
+  color: var(--color-white);
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+}
