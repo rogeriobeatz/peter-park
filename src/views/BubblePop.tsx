@@ -16,8 +16,8 @@ const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEEAD', '#D4A5A5'
 const BubblePop: React.FC = () => {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [score, setScore] = useState(0);
-  const requestRef = useRef<number>();
-  const lastTimeRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   // Inicializa o contexto de áudio (precisa ser disparado por um toque no iOS)
