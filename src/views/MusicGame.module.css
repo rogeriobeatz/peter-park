@@ -1,0 +1,116 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f3ff;
+  padding: 40px;
+  overflow: hidden;
+  align-items: center;
+}
+
+.header { margin-bottom: 20px; }
+.title { font-size: 40px; color: #5b21b6; }
+
+.stage {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.instrumentArea {
+  flex: 1;
+  height: 80%;
+  background: white;
+  border-radius: 50px;
+  border: 10px solid #ddd6fe;
+  box-shadow: 0 15px 0 rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.arrowLeft, .arrowRight {
+  font-size: 60px;
+  background: white;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instrumentLabel {
+  margin-top: 30px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #7c3aed;
+  background: white;
+  padding: 10px 40px;
+  border-radius: 30px;
+  box-shadow: 0 5px 0 #ede9fe;
+}
+
+/* Xylophone Styles */
+.xylophone {
+  display: flex;
+  width: 90%;
+  height: 90%;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+}
+
+.bar {
+  flex: 1;
+  border-radius: 20px;
+  box-shadow: 0 10px 0 rgba(0,0,0,0.1);
+  cursor: pointer;
+  border: 5px solid rgba(255,255,255,0.3);
+}
+
+.bar:active { transform: translateY(5px); box-shadow: 0 5px 0 rgba(0,0,0,0.1); }
+
+/* Drums Styles */
+.drums {
+  display: flex;
+  gap: 40px;
+  font-size: 150px;
+}
+
+.snare, .kick, .cymbal {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.snare:active, .kick:active, .cymbal:active { transform: scale(1.1); }
+
+/* Guitar Styles */
+.guitar {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  height: 80%;
+  justify-content: space-around;
+  background: #78350f;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.string {
+  height: 10px;
+  width: 100%;
+  background: linear-gradient(to bottom, #d1d5db, #9ca3af);
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.string:active { background: white; }

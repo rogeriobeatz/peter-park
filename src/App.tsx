@@ -6,6 +6,9 @@ import ShapesGame from './views/ShapesGame';
 import FeedingGame from './views/FeedingGame';
 import MassinhaGame from './views/MassinhaGame';
 import NumbersGame from './views/NumbersGame';
+import MusicGame from './views/MusicGame';
+import RabbitJump from './views/RabbitJump';
+import WhackGame from './views/WhackGame';
 import BackgroundMusic from './components/BackgroundMusic';
 
 function App() {
@@ -33,6 +36,12 @@ function App() {
         return <MassinhaGame />;
       case 'numeros':
         return <NumbersGame />;
+      case 'musica':
+        return <MusicGame />;
+      case 'pula':
+        return <RabbitJump />;
+      case 'smak':
+        return <WhackGame />;
       default:
         return (
           <div style={{ 
@@ -56,7 +65,14 @@ function App() {
         <Park onSelectGame={handleSelectGame} />
       ) : (
         <div className="game-wrapper">
-          <header style={{ padding: '20px', position: 'absolute', top: 0, left: 0, zIndex: 100 }}>
+          <header style={{ 
+            padding: '20px', 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            zIndex: 9999,
+            pointerEvents: 'none' 
+          }}>
             <button 
               className="bouncy-tap"
               onClick={handleBackToPark}
@@ -66,10 +82,12 @@ function App() {
                 borderRadius: '50%',
                 width: '80px',
                 height: '80px',
-                boxShadow: '0 6px 0 rgba(0,0,0,0.1)',
+                boxShadow: '0 8px 0 rgba(0,0,0,0.2)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                pointerEvents: 'auto',
+                border: '4px solid var(--color-primary)'
               }}
             >
               🏠

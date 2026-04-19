@@ -59,8 +59,9 @@ const MassinhaGame: React.FC = () => {
     ctx.moveTo(x, y);
     ctx.strokeStyle = activeColor;
     
-    // Mix mode for tactile feel
-    ctx.globalCompositeOperation = 'multiply';
+    // Use standard mode with transparency for mixing without burning to black
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.5;
     
     playPopSound(400);
   };

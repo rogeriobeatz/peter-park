@@ -59,7 +59,9 @@ const BubblePop: React.FC = () => {
     const size = 100 + Math.random() * 120;
     const x = Math.random() * (window.innerWidth - size);
     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const speed = 1.5 + Math.random() * 2.5;
+    const baseSpeed = 1.5 + Math.random() * 2.5;
+    const difficultyMultiplier = 1 + (score / 20); // 10% faster every 2 bubbles
+    const speed = baseSpeed * difficultyMultiplier;
 
     setBubbles((prev) => [...prev, { id, x, y: window.innerHeight + 100, size, color, speed, isPopping: false }]);
   }, []);

@@ -94,6 +94,15 @@
   cursor: grabbing;
 }
 
+.ghost {
+  position: fixed;
+  font-size: 80px;
+  pointer-events: none;
+  z-index: 1000;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+  transform: scale(1.2);
+}
+
 .resetBtn {
   margin-top: 50px;
   background-color: var(--color-secondary);

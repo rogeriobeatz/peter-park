@@ -96,8 +96,3 @@
   font-size: 120px;
   opacity: 0.8;
 }
-
-/* Ensure the Back Home button is never covered */
-:global(.game-wrapper header) {
-  z-index: 100 !important;
-}
