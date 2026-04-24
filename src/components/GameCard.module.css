@@ -20,8 +20,13 @@
 
 .title {
   color: var(--color-white);
-  font-size: 28px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 700; /* Força a variação bold e fofa */
+  text-transform: capitalize; /* Capitalize é mais amigável que Uppercase para crianças */
+  letter-spacing: 0.5px;
+  text-shadow: 
+    2px 2px 0px rgba(0, 0, 0, 0.15),
+    -1px -1px 0px rgba(255, 255, 255, 0.2);
+  margin-top: 5px;
+  text-align: center;
 }

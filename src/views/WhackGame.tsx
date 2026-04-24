@@ -2,155 +2,193 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './WhackGame.module.css';
 import { playSuccessSound, playErrorSound, playPopSound } from '../utils/audio';
 
-type EntityType = 'monster' | 'cute';
-
-interface Entity {
+interface SoupItem {
   id: number;
-  type: EntityType;
-}
-
-interface HammerHit {
-  id: number;
+  image: string;
+  type: 'food' | 'trash';
   x: number;
-  y: number;
 }
 
-const WhackGame: React.FC = () => {
-  // 5 slots for entities
-  const [slots, setSlots] = useState<(Entity | null)[]>([null, null, null, null, null]);
-  const [hitStates, setHitStates] = useState<Record<number, 'squished' | 'shaking' | null>>({});
+const INGREDIENTS = [
+  '/sprites/soup/ingredients/broccoli.png',
+  '/sprites/soup/ingredients/carrot.png',
+  '/sprites/soup/ingredients/corn.png',
+  '/sprites/soup/ingredients/mushroom.png',
+  '/sprites/soup/ingredients/potato.png',
+  '/sprites/soup/ingredients/pumpkin.png',
+  '/sprites/soup/ingredients/tomato.png'
+];
+
+const TRASH = [
+  '/sprites/soup/trash/brick.png',
+  '/sprites/soup/trash/cactus.png',
+  '/sprites/soup/trash/car.png',
+  '/sprites/soup/trash/duck.png',
+  '/sprites/soup/trash/fly.png',
+  '/sprites/soup/trash/shoe.png',
+  '/sprites/soup/trash/sock.png'
+];
+
+const SoupGame: React.FC = () => {
+  const [items, setItems] = useState<SoupItem[]>([]);
+  const [soupState, setSoupState] = useState<'idle' | 'happy' | 'yucky'>('idle');
   const [score, setScore] = useState(0);
-  const [hammerHits, setHammerHits] = useState<HammerHit[]>([]);
+  const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
+  const [isOverPot, setIsOverPot] = useState(false);
   
-  const spawnTimerRef = useRef<number | null>(null);
+  const potRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef<number>(undefined);
 
-  const spawn = useCallback(() => {
-    setSlots(prev => {
-      const emptyIndices = prev.map((e, i) => e === null ? i : -1).filter(i => i !== -1);
-      if (emptyIndices.length === 0) return prev;
-
-      const holeIndex = emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
-      const type: EntityType = Math.random() > 0.4 ? 'monster' : 'cute';
-      const id = Date.now();
-
-      const next = [...prev];
-      next[holeIndex] = { id, type };
-
-      // Set auto-hide timer
-      setTimeout(() => {
-        setSlots(current => {
-          const updated = [...current];
-          if (updated[holeIndex]?.id === id) {
-            updated[holeIndex] = null;
-          }
-          return updated;
-        });
-      }, 2000 + Math.random() * 1000);
-
-      return next;
-    });
+  const spawnItem = useCallback(() => {
+    const isFood = Math.random() > 0.4;
+    const list = isFood ? INGREDIENTS : TRASH;
+    const newItem: SoupItem = {
+      id: Date.now() + Math.random(),
+      image: list[Math.floor(Math.random() * list.length)],
+      type: isFood ? 'food' : 'trash',
+      x: -200,
+    };
+    setItems(prev => [...prev, newItem]);
   }, []);
 
+  const update = useCallback(() => {
+    setItems(prev => prev
+      .map(item => (item.id === activeDragId ? item : { ...item, x: item.x + 2.5 }))
+      .filter(item => item.x < window.innerWidth + 200)
+    );
+    requestRef.current = requestAnimationFrame(update);
+  }, [activeDragId]);
+
   useEffect(() => {
-    spawnTimerRef.current = setInterval(() => {
-      if (Math.random() > 0.4) spawn();
-    }, 800);
+    requestRef.current = requestAnimationFrame(update);
+    const interval = setInterval(spawnItem, 2500);
     return () => {
-      if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      clearInterval(interval);
     };
-  }, [spawn]);
+  }, [spawnItem, update]);
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    // Global hammer effect
-    const newHit = { id: Date.now(), x: e.clientX, y: e.clientY };
-    setHammerHits(prev => [...prev, newHit]);
-    playPopSound(150); // Deep thud
-
-    setTimeout(() => {
-      setHammerHits(prev => prev.filter(h => h.id !== newHit.id));
-    }, 200);
+  const handlePointerDown = (e: React.PointerEvent, item: SoupItem) => {
+    setActiveDragId(item.id);
+    setDragPos({ x: e.clientX, y: e.clientY });
+    playPopSound(600);
   };
 
-  const handleWhack = (e: React.PointerEvent, index: number) => {
-    e.stopPropagation(); // Prevent global hammer trigger if we hit an entity specifically
-    handlePointerDown(e);
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (activeDragId !== null) {
+      setDragPos({ x: e.clientX, y: e.clientY });
+      
+      if (potRef.current) {
+        const rect = potRef.current.getBoundingClientRect();
+        // Área de colisão expandida para facilitar o jogo
+        const isCurrentlyOver = e.clientX > rect.left - 50 && e.clientX < rect.right + 50 && 
+                                e.clientY > rect.top - 50 && e.clientY < rect.bottom + 50;
+        setIsOverPot(isCurrentlyOver);
+      }
+    }
+  };
 
-    const entity = slots[index];
-    if (!entity || hitStates[index]) return;
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (activeDragId === null) return;
 
-    if (entity.type === 'monster') {
-      playSuccessSound();
-      setScore(s => s + 1);
-      setHitStates(prev => ({ ...prev, [index]: 'squished' }));
-    } else {
-      playErrorSound();
-      setScore(s => Math.max(0, s - 1));
-      setHitStates(prev => ({ ...prev, [index]: 'shaking' }));
+    const draggedItem = items.find(i => i.id === activeDragId);
+    
+    // Verificação de colisão final no momento do soltar
+    let finalOver = isOverPot;
+    if (potRef.current) {
+      const rect = potRef.current.getBoundingClientRect();
+      finalOver = e.clientX > rect.left - 50 && e.clientX < rect.right + 50 && 
+                  e.clientY > rect.top - 50 && e.clientY < rect.bottom + 50;
     }
 
-    // Clean up hit state and remove entity
-    setTimeout(() => {
-      setHitStates(prev => {
-        const next = { ...prev };
-        delete next[index];
-        return next;
-      });
-      setSlots(prev => {
-        const next = [...prev];
-        next[index] = null;
-        return next;
-      });
-    }, 400);
+    if (finalOver && draggedItem) {
+      if (draggedItem.type === 'food') {
+        playSuccessSound();
+        setScore(s => s + 1);
+        setSoupState('happy');
+      } else {
+        playErrorSound();
+        setSoupState('yucky');
+      }
+      
+      setTimeout(() => setSoupState('idle'), 2000);
+      setItems(prev => prev.filter(i => i.id !== activeDragId));
+    }
+
+    setActiveDragId(null);
+    setIsOverPot(false);
   };
 
   return (
-    <div className={styles.container} onPointerDown={handlePointerDown}>
-      <div className={styles.gardenLayer} />
+    <div 
+      className={styles.container} 
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerLeave={handlePointerUp}
+    >
+      <div className={styles.bgOverlay} />
       
       <header className={styles.header}>
-        <div className={styles.scoreCard}>
-          <span className={styles.scoreLabel}>PONTOS:</span>
-          <span className={styles.scoreValue}>{score}</span>
+        <div className={styles.scoreBoard}>
+          Minha Sopa: {score} 🍲
         </div>
       </header>
 
-      <main className={styles.gameArea}>
-        {slots.map((entity, i) => (
-          <div key={i} className={styles.holeWrapper}>
-            <div className={styles.hole} />
-            <div className={styles.dirt} />
-            <div className={styles.entityContainer}>
-              {entity && (
-                <div 
-                  className={`
-                    ${styles.entity} 
-                    ${hitStates[i] === 'squished' ? styles.squished : ''} 
-                    ${hitStates[i] === 'shaking' ? styles.shaking : ''}
-                  `}
-                  onPointerDown={(e) => handleWhack(e, i)}
-                >
-                  {entity.type === 'monster' ? '👹' : '🐰'}
-                </div>
-              )}
+      {/* Esteira */}
+      <div className={styles.conveyorArea}>
+        <div className={styles.beltImage} />
+        <div className={styles.itemsLayer}>
+          {items.map(item => (
+            <div
+              key={item.id}
+              className={`${styles.item} ${activeDragId === item.id ? styles.dragging : ''}`}
+              style={{ 
+                left: activeDragId === item.id ? dragPos.x - 80 : item.x,
+                top: activeDragId === item.id ? dragPos.y - 80 : 'auto',
+                position: activeDragId === item.id ? 'fixed' : 'absolute',
+              }}
+              onPointerDown={(e) => handlePointerDown(e, item)}
+            >
+              <img src={item.image} alt="ingrediente" className={styles.itemImg} />
             </div>
-          </div>
-        ))}
-      </main>
+          ))}
+        </div>
+      </div>
 
-      {/* Visual Hammer Effects */}
-      {hammerHits.map(hit => (
-        <div 
-          key={hit.id} 
-          className={styles.hammerEffect} 
-          style={{ left: hit.x - 50, top: hit.y - 50 }} 
-        />
-      ))}
+      {/* Panela com Sistema de Camadas (Instantâneo) */}
+      <div 
+        ref={potRef}
+        className={`
+          ${styles.potContainer} 
+          ${isOverPot ? styles.over : ''}
+        `}
+      >
+        <div className={styles.potLayers}>
+          <img 
+            src="/sprites/soup/pot/pot_idle.png" 
+            className={`${styles.potImg} ${soupState === 'idle' ? styles.visible : styles.hidden}`} 
+            alt="Panela Normal" 
+          />
+          <img 
+            src="/sprites/soup/pot/pot_happy.png" 
+            className={`${styles.potImg} ${soupState === 'happy' ? styles.visible : styles.hidden} ${styles.glowGreen}`} 
+            alt="Panela Feliz" 
+          />
+          <img 
+            src="/sprites/soup/pot/pot_yucky.png" 
+            className={`${styles.potImg} ${soupState === 'yucky' ? styles.visible : styles.hidden} ${styles.shake}`} 
+            alt="Panela Eca" 
+          />
+        </div>
+        <div className={styles.potLabel}>Panela do Peter</div>
+      </div>
 
-      <div className={styles.hint}>
-        Bata no 👹, não na 🐰!
+      <div className={styles.instruction}>
+        Arraste a comida para a panela! 🥕
       </div>
     </div>
   );
 };
 
-export default WhackGame;
+export default SoupGame;

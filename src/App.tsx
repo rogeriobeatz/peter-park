@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import Park from './views/Park';
-import BubblePop from './views/BubblePop';
-import MemoryGame from './views/MemoryGame';
-import ShapesGame from './views/ShapesGame';
-import FeedingGame from './views/FeedingGame';
-import MassinhaGame from './views/MassinhaGame';
+import BubblePop from './views/BubblePop/BubblePop';
+import MemoryGame from './views/MemoryGame/MemoryGame';
+import ShapesGame from './views/ShapesGame/ShapesGame';
+import FeedingGame from './views/FeedingGame/FeedingGame';
+import MassinhaGame from './views/MassinhaGame/MassinhaGame';
 import NumbersGame from './views/NumbersGame';
-import MusicGame from './views/MusicGame';
-import RabbitJump from './views/RabbitJump';
+import MusicGame from './views/MusicGame/MusicGame';
 import WhackGame from './views/WhackGame';
 import BackgroundMusic from './components/BackgroundMusic';
 
@@ -38,8 +37,6 @@ function App() {
         return <NumbersGame />;
       case 'musica':
         return <MusicGame />;
-      case 'pula':
-        return <RabbitJump />;
       case 'smak':
         return <WhackGame />;
       default:
@@ -66,10 +63,10 @@ function App() {
       ) : (
         <div className="game-wrapper">
           <header style={{ 
-            padding: '20px', 
+            padding: 'calc(10px + env(safe-area-inset-top)) 20px', 
             position: 'fixed', 
             top: 0, 
-            left: 0, 
+            left: 'env(safe-area-inset-left)', 
             zIndex: 9999,
             pointerEvents: 'none' 
           }}>
@@ -77,11 +74,11 @@ function App() {
               className="bouncy-tap"
               onClick={handleBackToPark}
               style={{
-                fontSize: '40px',
+                fontSize: 'clamp(30px, 5vw, 40px)',
                 background: 'var(--color-white)',
                 borderRadius: '50%',
-                width: '80px',
-                height: '80px',
+                width: 'clamp(60px, 10vw, 80px)',
+                height: 'clamp(60px, 10vw, 80px)',
                 boxShadow: '0 8px 0 rgba(0,0,0,0.2)',
                 display: 'flex',
                 alignItems: 'center',

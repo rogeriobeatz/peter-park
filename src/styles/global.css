@@ -1,72 +1,68 @@
-@import "@fontsource/fredoka/400.css";
-@import "@fontsource/fredoka/700.css";
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
 
 :root {
-  --color-primary: #FFCF00; /* Sunny Yellow */
-  --color-secondary: #FF6B6B; /* Soft Red */
-  --color-accent: #4ECDC4; /* Mint Blue */
-  --color-bg: #F7FFF7; /* Off White */
-  --color-text: #2F2F2F;
-  --color-white: #FFFFFF;
-  --font-main: 'Fredoka', sans-serif;
+  --color-bg: #f0f9ff;
+  --color-primary: #FF6B6B;
+  --color-secondary: #4ECDC4;
+  --color-accent: #FFD93D;
+  --color-white: #ffffff;
+  --color-text: #2D3436;
+  
+  /* Sistema de Arredondamento */
+  --radius-sm: 10px;
+  --radius-md: 20px;
   --radius-lg: 40px;
-  --radius-md: 24px;
+  --radius-full: 100px;
 }
 
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  font-family: 'Fredoka', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body, html, #root {
+body, html {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Prevent scrolling on iPad */
-  font-family: var(--font-main);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-}
-
-/* Ensure iPad safe areas are respected */
-body {
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-}
-
-h1, h2, h3 {
-  font-weight: 700;
-  margin: 0;
-}
-
-button {
-  font-family: var(--font-main);
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  outline: none;
-  background: none;
-}
-
-.app-container, .game-wrapper {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
   overflow: hidden;
+  background-color: var(--color-bg);
+  position: fixed;
+  font-family: 'Fredoka', sans-serif; /* Fonte restaurada */
 }
 
-/* Bouncy Animation for all interactive elements */
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+/* Utilitário de Toque Suave */
 .bouncy-tap {
   transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  touch-action: manipulation;
+  cursor: pointer;
 }
 
 .bouncy-tap:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
+}
+
+/* Suporte a Safe Areas (Notch do iPhone) */
+.app-container {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  height: 100vh;
+  width: 100vw;
+}
+
+.game-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }

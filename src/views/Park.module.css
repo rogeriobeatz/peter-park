@@ -6,6 +6,12 @@
   position: relative;
   overflow: hidden;
   background: linear-gradient(to bottom, #A5F3FC 0%, #BAE6FD 40%, #BBF7D0 100%);
+  
+  /* Proteção para Notch e Barras do iPhone */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .content {
@@ -16,54 +22,55 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(20px, 5vw, 60px);
+  padding: clamp(10px, 3vw, 40px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 .header {
   text-align: center;
-  margin-bottom: clamp(20px, 4vh, 60px);
+  margin-top: 10px;
+  margin-bottom: clamp(15px, 3vh, 40px);
 }
 
 .titleWrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 15px;
 }
 
 .title {
-  font-size: clamp(40px, 8vw, 80px);
+  font-size: clamp(40px, 10vw, 90px);
+  font-weight: 700;
   color: #0369A1;
-  text-shadow: 4px 4px 0 rgba(255, 255, 255, 0.8);
+  text-shadow: 
+    4px 4px 0px #fff, 
+    8px 8px 0px rgba(0, 0, 0, 0.05);
   margin: 0;
+  letter-spacing: -1px;
 }
 
 .subtitle {
-  font-size: clamp(24px, 4vw, 32px);
+  font-size: clamp(20px, 4vw, 32px);
   color: #075985;
-  margin: 10px 0 0;
-  font-weight: 700;
-}
-
-.emojiLeft, .emojiRight {
-  font-size: clamp(30px, 6vw, 60px);
-  animation: float 3s infinite ease-in-out;
-}
-
-.emojiRight {
-  animation-delay: 1.5s;
+  margin: 5px 0 0;
+  font-weight: 600;
+  background: #fff;
+  padding: 5px 30px;
+  border-radius: 50px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.05);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: clamp(15px, 3vw, 40px);
+  /* Grid flexível: 2 colunas no celular em pé, mais colunas deitado */
+  grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 20vw, 200px), 1fr));
+  gap: clamp(10px, 2.5vw, 30px);
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: 100px; /* Space for pets */
+  padding-bottom: 80px;
 }
 
 /* Sky Decorations */
@@ -80,27 +87,19 @@
   position: absolute;
   top: 40px;
   right: 10%;
-  font-size: clamp(60px, 10vw, 120px);
+  font-size: clamp(50px, 8vw, 100px);
   animation: pulse 4s infinite ease-in-out;
 }
 
 .cloud {
   position: absolute;
-  font-size: 80px;
-  opacity: 0.8;
+  font-size: 60px;
+  opacity: 0.6;
   animation: moveCloud 20s infinite linear;
 }
 
-.cloud1 { top: 10%; left: -100px; animation-duration: 30s; }
-.cloud2 { top: 25%; left: -150px; animation-duration: 45s; animation-delay: 5s; }
-
-.bird {
-  position: absolute;
-  top: 15%;
-  right: -50px;
-  font-size: 40px;
-  animation: moveBird 15s infinite linear;
-}
+.cloud1 { top: 10%; left: -100px; animation-duration: 25s; }
+.cloud2 { top: 25%; left: -150px; animation-duration: 35s; animation-delay: 5s; }
 
 /* Nature Decorations */
 .nature {
@@ -108,7 +107,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 120px;
+  height: 100px;
   pointer-events: none;
   z-index: 5;
 }
@@ -117,51 +116,23 @@
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 60px;
+  height: 50px;
   background-color: #4ADE80;
-  border-radius: 100% 100% 0 0 / 20% 20% 0 0;
-}
-
-.butterfly {
-  position: absolute;
-  bottom: 100px;
-  left: 10%;
-  font-size: 40px;
-  animation: fly 8s infinite ease-in-out;
-}
-
-.butterfly2 {
-  left: auto;
-  right: 15%;
-  animation-duration: 11s;
-  animation-delay: 2s;
-}
-
-.flowers {
-  position: absolute;
-  bottom: 20px;
-  left: 5%;
-  font-size: 30px;
 }
 
 .pets {
   position: absolute;
   bottom: 10px;
   right: 5%;
-  font-size: 50px;
+  font-size: clamp(30px, 5vw, 50px);
   display: flex;
   gap: 10px;
 }
 
 /* Animations */
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(0); }
-  50% { transform: translateY(-10px) rotate(5deg); }
-}
-
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.1); opacity: 1; }
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 @keyframes moveCloud {
@@ -169,26 +140,10 @@
   to { transform: translateX(calc(100vw + 200px)); }
 }
 
-@keyframes moveBird {
-  from { transform: translateX(0) translateY(0); }
-  to { transform: translateX(calc(-100vw - 100px)) translateY(20px); }
-}
-
-@keyframes fly {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  25% { transform: translate(50px, -30px) rotate(10deg); }
-  50% { transform: translate(100px, 0px) rotate(-10deg); }
-  75% { transform: translate(50px, 30px) rotate(5deg); }
-}
-
-/* Responsivity */
-@media (min-width: 768px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 600px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
-  .title { font-size: 40px; }
-  .subtitle { font-size: 20px; }
-  .pets { font-size: 30px; }
+/* Responsividade Especial para Paisagem (Landscape) */
+@media (orientation: landscape) and (max-height: 500px) {
+  .header { margin-bottom: 10px; }
+  .title { font-size: 32px; }
+  .subtitle { display: none; } /* Esconde o subtítulo para ganhar espaço deitado */
+  .grid { padding-bottom: 40px; }
 }

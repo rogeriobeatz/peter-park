@@ -14,8 +14,7 @@ const GAMES = [
   { id: 'massinha', title: 'Massinha', icon: '🎨', color: '#45B7D1' },
   { id: 'numeros', title: 'Números', icon: '🚂', color: '#FFCF00' },
   { id: 'musica', title: 'Banda', icon: '🎸', color: '#A78BFA' },
-  { id: 'pula', title: 'Pula Pula', icon: '🐰', color: '#34D399' },
-  { id: 'smak', title: 'Bate-Bate', icon: '🔨', color: '#F87171' },
+  { id: 'smak', title: 'Sopa Mágica', icon: '🍲', color: '#F87171' },
 ];
 
 const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
