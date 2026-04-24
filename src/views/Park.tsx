@@ -39,9 +39,10 @@ const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
         </header>
 
         <main className={styles.grid}>
-          {GAMES.map((game) => (
+          {GAMES.map((game, index) => (
             <GameCard
               key={game.id}
+              index={index}
               title={game.title}
               icon={game.icon}
               color={game.color}
