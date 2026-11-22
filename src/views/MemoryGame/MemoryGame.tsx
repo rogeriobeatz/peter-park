@@ -86,7 +86,7 @@ const MemoryGame: React.FC = () => {
       }, 500);
     } else {
       // ERRO
-      setTimeout(() => {
+      scheduleTimeout(() => {
         setCards(prev => prev.map(c => 
           ids.includes(c.id) ? { ...c, isFlipped: false } : c
         ));
