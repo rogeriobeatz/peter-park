@@ -28,6 +28,19 @@ test('ball remains inside the maze and does not cross a wall', () => {
   assert.equal(isWallAt(ball.x, ball.y), false);
 });
 
+test('ball rapidly tracks a strong sensor tilt with higher speed', () => {
+  const next = stepBall(START_POSITION, { x: 1, y: 0 }, 0.04);
+  assert.ok(next.vx > 3.5, `expected fast response, got ${next.vx}`);
+  assert.ok(next.x - START_POSITION.x > 0.1);
+});
+
+test('ball slows promptly when the phone returns to level', () => {
+  const moving = stepBall(START_POSITION, { x: 1, y: 0 }, 0.04);
+  const released = stepBall(moving, { x: 0, y: 0 }, 0.04);
+  assert.ok(released.vx < moving.vx);
+  assert.ok(released.vx > 0);
+});
+
 test('large frame gaps are clamped to keep physics stable', () => {
   const a = stepBall(START_POSITION, { x: 1, y: 0 }, 1);
   const b = stepBall(START_POSITION, { x: 1, y: 0 }, 0.04);
