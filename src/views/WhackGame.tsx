@@ -39,7 +39,6 @@ const SoupGame: React.FC = () => {
   const activeDragIdRef = useRef<number | null>(null);
   
   const potRef = useRef<HTMLDivElement>(null);
-  const requestRef = useRef<number>(undefined);
 
   const spawnItem = useCallback(() => {
     const isFood = Math.random() > 0.4;
