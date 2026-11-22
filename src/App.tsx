@@ -40,9 +40,9 @@ function App() {
       <BackgroundMusic />
       {!activeGame ? <Park onSelectGame={setActiveGame} /> : (
         <div className="game-wrapper">
-          <header className="game-home-header">
+          {activeGame !== 'labirinto' && <header className="game-home-header">
             <button className="bouncy-tap" onClick={() => setActiveGame(null)} aria-label="Voltar ao parque">🏠</button>
-          </header>
+          </header>}
           {renderGame()}
         </div>
       )}
