@@ -15,6 +15,7 @@ const GAMES = [
   { id: 'numeros', title: 'Números', icon: '🚂', color: '#FFCF00' },
   { id: 'musica', title: 'Banda', icon: '🎸', color: '#A78BFA' },
   { id: 'smak', title: 'Sopa Mágica', icon: '🍲', color: '#F87171' },
+  { id: 'labirinto', title: 'Labirinto', icon: '🌀', color: '#7DD3FC' },
 ];
 
 const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
