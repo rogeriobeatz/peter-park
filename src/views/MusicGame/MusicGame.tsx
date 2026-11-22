@@ -25,7 +25,7 @@ const MusicGame: React.FC = () => {
 
   const initAudio = useCallback(() => {
     if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioCtxRef.current = new AudioContext();
     }
     if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
   }, []);
@@ -96,7 +96,9 @@ const MusicGame: React.FC = () => {
       activePointers.current.set(e.pointerId, noteId);
       
       if (drumType) {
-        playDrum(drumType as any);
+        if (['kick', 'snare', 'hihat', 'tom'].includes(drumType)) {
+          playDrum(drumType as 'kick' | 'snare' | 'hihat' | 'tom');
+        }
       } else if (freq) {
         playSound(parseFloat(freq), (type as OscillatorType) || 'sine');
       }
