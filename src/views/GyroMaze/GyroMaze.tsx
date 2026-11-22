@@ -19,6 +19,7 @@ const GyroMaze = () => {
   const baselineRef = useRef<{ beta: number; gamma: number } | null>(null);
   const ballRef = useRef<MazeVector>(START_POSITION);
   const lastFrameRef = useRef(0);
+  const lastTileRef = useRef('1,1');
 
   const reset = useCallback(() => {
     ballRef.current = { ...START_POSITION };
@@ -27,6 +28,7 @@ const GyroMaze = () => {
     setWon(false);
     setMoves(0);
     lastFrameRef.current = 0;
+    lastTileRef.current = '1,1';
   }, []);
 
   const handleOrientation = useCallback((event: DeviceOrientationEvent) => {
@@ -79,6 +81,11 @@ const GyroMaze = () => {
         const next = stepBall(ballRef.current, tiltRef.current, delta);
         ballRef.current = next;
         setBall(next);
+        const tile = `${Math.floor(next.x)},${Math.floor(next.y)}`;
+        if (tile !== lastTileRef.current) {
+          lastTileRef.current = tile;
+          setMoves(value => value + 1);
+        }
         if (isGoalAt(next.x, next.y)) setWon(true);
       }
       frame = requestAnimationFrame(animate);
@@ -93,7 +100,6 @@ const GyroMaze = () => {
 
   const setPadTilt = (x: number, y: number) => {
     tiltRef.current = { x, y };
-    setMoves(value => value + 1);
   };
 
   const releasePad = () => {
@@ -137,10 +143,10 @@ const GyroMaze = () => {
       <div className={styles.bottomPanel}>
         <div className={styles.progress}><span>Movimentos</span><strong>{moves}</strong></div>
         <div className={styles.dpad} aria-label="Controles alternativos">
-          <button onPointerDown={() => setPadTilt(0, -1)} onPointerUp={releasePad} onPointerLeave={releasePad} aria-label="Mover para cima">▲</button>
-          <button onPointerDown={() => setPadTilt(-1, 0)} onPointerUp={releasePad} onPointerLeave={releasePad} aria-label="Mover para esquerda">◀</button>
-          <button onPointerDown={() => setPadTilt(0, 1)} onPointerUp={releasePad} onPointerLeave={releasePad} aria-label="Mover para baixo">▼</button>
-          <button onPointerDown={() => setPadTilt(1, 0)} onPointerUp={releasePad} onPointerLeave={releasePad} aria-label="Mover para direita">▶</button>
+          <button onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setPadTilt(0, -1); }} onPointerUp={releasePad} onPointerCancel={releasePad} aria-label="Mover para cima">▲</button>
+          <button onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setPadTilt(-1, 0); }} onPointerUp={releasePad} onPointerCancel={releasePad} aria-label="Mover para esquerda">◀</button>
+          <button onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setPadTilt(0, 1); }} onPointerUp={releasePad} onPointerCancel={releasePad} aria-label="Mover para baixo">▼</button>
+          <button onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); setPadTilt(1, 0); }} onPointerUp={releasePad} onPointerCancel={releasePad} aria-label="Mover para direita">▶</button>
         </div>
       </div>
 
