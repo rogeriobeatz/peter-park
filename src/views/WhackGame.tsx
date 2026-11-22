@@ -36,6 +36,7 @@ const SoupGame: React.FC = () => {
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
   const [isOverPot, setIsOverPot] = useState(false);
+  const activeDragIdRef = useRef<number | null>(null);
   
   const potRef = useRef<HTMLDivElement>(null);
   const requestRef = useRef<number>(undefined);
@@ -52,24 +53,26 @@ const SoupGame: React.FC = () => {
     setItems(prev => [...prev, newItem]);
   }, []);
 
-  const update = useCallback(() => {
-    setItems(prev => prev
-      .map(item => (item.id === activeDragId ? item : { ...item, x: item.x + 2.5 }))
-      .filter(item => item.x < window.innerWidth + 200)
-    );
-    requestRef.current = requestAnimationFrame(update);
-  }, [activeDragId]);
-
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(update);
-    const interval = setInterval(spawnItem, 2500);
-    return () => {
-      if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      clearInterval(interval);
+    let frame = 0;
+    const update = () => {
+      setItems(prev => prev
+        .map(item => (item.id === activeDragIdRef.current ? item : { ...item, x: item.x + 2.5 }))
+        .filter(item => item.x < window.innerWidth + 200)
+      );
+      frame = requestAnimationFrame(update);
     };
-  }, [spawnItem, update]);
+    frame = requestAnimationFrame(update);
+    const interval = window.setInterval(spawnItem, 2500);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearInterval(interval);
+    };
+  }, [spawnItem]);
 
   const handlePointerDown = (e: React.PointerEvent, item: SoupItem) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    activeDragIdRef.current = item.id;
     setActiveDragId(item.id);
     setDragPos({ x: e.clientX, y: e.clientY });
     playPopSound(600);
@@ -116,6 +119,7 @@ const SoupGame: React.FC = () => {
       setItems(prev => prev.filter(i => i.id !== activeDragId));
     }
 
+    activeDragIdRef.current = null;
     setActiveDragId(null);
     setIsOverPot(false);
   };
@@ -125,7 +129,7 @@ const SoupGame: React.FC = () => {
       className={styles.container} 
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
       <div className={styles.bgOverlay} />
       
