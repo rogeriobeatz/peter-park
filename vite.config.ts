@@ -1,8 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { VitePWA } from 'vite-plugin-pwa'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -10,27 +9,27 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Peter Park',
-        short_name: 'PeterPark',
-        description: 'Um parque de diversões para crianças!',
+        name: 'Peter Park — Jogos Educativos',
+        short_name: 'Peter Park',
+        description: 'Um parque de mini-jogos educativos para crianças!',
         theme_color: '#FFCF00',
         background_color: '#F7FFF7',
         display: 'standalone',
-        orientation: 'landscape',
+        display_override: ['standalone', 'minimal-ui'],
+        orientation: 'any',
+        categories: ['education', 'games', 'kids'],
+        lang: 'pt-BR',
         icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png',
-            purpose: 'any maskable'
-          }
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' }
         ]
+      },
+      workbox: {
+        navigateFallback: '/index.html',
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true
       }
     })
-  ],
-})
+  ]
+});
