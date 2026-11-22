@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './MemoryGame.module.css';
 import { playSuccessSound, playPopSound } from '../../utils/audio';
 
@@ -10,9 +10,11 @@ interface Card {
 }
 
 const EMOJIS = ['🦁', '🦒', '🐘', '🦄', '🐧', '🦖', '🐝', '🐙', '🦋', '🐥', '🐸', '🐹'];
+const INITIAL_ORDER = [0, 3, 1, 4, 2, 5, 0, 4, 3, 1, 5, 2];
 
 const MemoryGame: React.FC = () => {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<Card[]>(() => INITIAL_ORDER.map((emojiIndex, id) => ({ id, emoji: EMOJIS[emojiIndex], isFlipped: false, isMatched: false })));
+  const timeoutRefs = useRef<number[]>([]);
   const [flippedIds, setFlippedIds] = useState<number[]>([]);
   const [isLocking, setIsLocking] = useState(false);
   const [matches, setMatches] = useState(0);
@@ -36,9 +38,17 @@ const MemoryGame: React.FC = () => {
     setIsLocking(false);
   }, []);
 
-  useEffect(() => {
-    initGame();
-  }, [initGame]);
+  const scheduleTimeout = (callback: () => void, delay: number) => {
+    const timer = window.scheduleTimeout(() => {
+      timeoutRefs.current = timeoutRefs.current.filter(id => id !== timer);
+      callback();
+    }, delay);
+    timeoutRefs.current.push(timer);
+  };
+
+  useEffect(() => () => {
+    timeoutRefs.current.forEach(window.clearTimeout);
+  }, []);
 
   const handleCardClick = (id: number) => {
     if (isLocking) return;
