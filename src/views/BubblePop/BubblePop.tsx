@@ -8,7 +8,7 @@ interface Bubble {
   size: number;
   color: string;
   speed: number;
-  wobble: number; // Para o movimento senoidal
+  wobble: number;
   wobbleSpeed: number;
   isPopping: boolean;
   isMagic?: boolean;
@@ -23,102 +23,114 @@ const COLORS = [
   { name: 'Roxo', hex: '#9B59B6' }
 ];
 
+function playBubbleSound(ctx: AudioContext, isMagic: boolean) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const freq = isMagic ? 200 : 400 + Math.random() * 300;
+
+  osc.type = isMagic ? 'triangle' : 'sine';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.1);
+  gain.gain.setValueAtTime(0.2, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start();
+  osc.stop(ctx.currentTime + 0.2);
+}
+
 const BubblePop: React.FC = () => {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [score, setScore] = useState(0);
-  const requestRef = useRef<number>(undefined);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const timeoutRefs = useRef<number[]>([]);
 
   const initAudio = () => {
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
+    if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+    if (audioCtxRef.current.state === 'suspended') void audioCtxRef.current.resume();
   };
 
-  const playPopSound = (isMagic = false) => {
-    if (!audioCtxRef.current) return;
-    const ctx = audioCtxRef.current;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const freq = isMagic ? 200 : 400 + Math.random() * 300;
-    
-    osc.type = isMagic ? 'triangle' : 'sine';
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.1);
-    gain.gain.setValueAtTime(0.2, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.2);
+  const scheduleTimeout = (callback: () => void, delay: number) => {
+    const timer = window.setTimeout(() => {
+      timeoutRefs.current = timeoutRefs.current.filter(id => id !== timer);
+      callback();
+    }, delay);
+    timeoutRefs.current.push(timer);
   };
 
   const spawnBubble = useCallback(() => {
     const id = Date.now() + Math.random();
     const size = 120 + Math.random() * 100;
-    const x = Math.random() * (window.innerWidth - size);
+    const x = Math.random() * Math.max(0, window.innerWidth - size);
     const isMagic = Math.random() < 0.07;
     const colorObj = COLORS[Math.floor(Math.random() * COLORS.length)];
-    
+
     const newItem: Bubble = {
       id,
       x,
       y: window.innerHeight + 100,
       size,
       color: isMagic ? 'linear-gradient(45deg, #FFD700, #FFF176)' : colorObj.hex,
-      speed: 0.6 + Math.random() * 0.8, // Velocidade pedagógica lenta
+      speed: 0.6 + Math.random() * 0.8,
       wobble: Math.random() * Math.PI * 2,
       wobbleSpeed: 0.02 + Math.random() * 0.03,
       isPopping: false,
       isMagic
     };
-    
+
     setBubbles(prev => {
       const maxBubbles = Math.min(35, 6 + Math.floor(score / 4));
-      if (prev.length < maxBubbles) return [...prev, newItem];
-      return prev;
+      return prev.length < maxBubbles ? [...prev, newItem] : prev;
     });
   }, [score]);
 
-  const update = useCallback(() => {
-    setBubbles(prev => prev.map(b => {
-      if (b.isPopping) return b;
-      // Movimento Senoidal (Balanço lateral suave)
-      const newWobble = b.wobble + b.wobbleSpeed;
-      const xOffset = Math.sin(newWobble) * 1.5;
-      return {
-        ...b,
-        y: b.y - b.speed,
-        x: b.x + xOffset,
-        wobble: newWobble
-      };
-    }).filter(b => b.y + b.size > -100));
-    
-    requestRef.current = requestAnimationFrame(update);
+  useEffect(() => {
+    let frame = 0;
+    let lastUpdate = 0;
+    const update = (timestamp: number) => {
+      if (timestamp - lastUpdate >= 30) {
+        setBubbles(prev => prev.map(bubble => {
+          if (bubble.isPopping) return bubble;
+          const wobble = bubble.wobble + bubble.wobbleSpeed;
+          return {
+            ...bubble,
+            y: bubble.y - bubble.speed,
+            x: bubble.x + Math.sin(wobble) * 1.5,
+            wobble
+          };
+        }).filter(bubble => bubble.y + bubble.size > -100));
+        lastUpdate = timestamp;
+      }
+      frame = requestAnimationFrame(update);
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(update);
-    const interval = setInterval(spawnBubble, Math.max(400, 1500 - (score * 30)));
-    return () => {
-      cancelAnimationFrame(requestRef.current!);
-      clearInterval(interval);
-    };
-  }, [spawnBubble, update, score]);
+    const interval = window.setInterval(spawnBubble, Math.max(400, 1500 - score * 30));
+    return () => window.clearInterval(interval);
+  }, [spawnBubble, score]);
+
+  useEffect(() => () => {
+    timeoutRefs.current.forEach(window.clearTimeout);
+    if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
+      void audioCtxRef.current.close();
+    }
+  }, []);
 
   const popBubble = (id: number, isMagic = false) => {
     initAudio();
-    playPopSound(isMagic);
+    if (audioCtxRef.current) playBubbleSound(audioCtxRef.current, isMagic);
 
     if (isMagic) {
-      setBubbles(prev => prev.map(b => ({ ...b, isPopping: true })));
-      setScore(s => s + bubbles.length);
-      setTimeout(() => setBubbles([]), 400);
+      setBubbles(prev => prev.map(bubble => ({ ...bubble, isPopping: true })));
+      setScore(value => value + bubbles.length);
+      scheduleTimeout(() => setBubbles([]), 400);
     } else {
-      setBubbles(prev => prev.map(b => b.id === id ? { ...b, isPopping: true } : b));
-      setScore(s => s + 1);
-      setTimeout(() => setBubbles(prev => prev.filter(b => b.id !== id)), 300);
+      setBubbles(prev => prev.map(bubble => bubble.id === id ? { ...bubble, isPopping: true } : bubble));
+      setScore(value => value + 1);
+      scheduleTimeout(() => setBubbles(prev => prev.filter(bubble => bubble.id !== id)), 300);
     }
   };
 
@@ -143,8 +155,8 @@ const BubblePop: React.FC = () => {
             background: bubble.color,
             '--pop-color': bubble.isMagic ? '#FFD700' : bubble.color
           } as React.CSSProperties}
-          onPointerDown={(e) => {
-            e.stopPropagation();
+          onPointerDown={event => {
+            event.stopPropagation();
             if (!bubble.isPopping) popBubble(bubble.id, bubble.isMagic);
           }}
         >
@@ -153,7 +165,6 @@ const BubblePop: React.FC = () => {
         </div>
       ))}
 
-      {/* Decoração de Fundo com Parallax Suave */}
       <div className={styles.decor}>
         <div className={styles.cloud1}>☁️</div>
         <div className={styles.cloud2}>☁️</div>
