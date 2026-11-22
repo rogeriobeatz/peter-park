@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styles from './FeedingGame.module.css';
 import { playSuccessSound, playPopSound, playErrorSound } from '../../utils/audio';
 
