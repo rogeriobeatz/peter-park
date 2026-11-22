@@ -103,7 +103,7 @@ const GyroMaze = () => {
   };
 
   const releasePad = () => {
-    if (!gyroEnabled) tiltRef.current = { x: 0, y: 0 };
+    tiltRef.current = { x: 0, y: 0 };
   };
 
   return (
