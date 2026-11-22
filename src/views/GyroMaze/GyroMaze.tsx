@@ -37,8 +37,8 @@ const GyroMaze = () => {
     const beta = event.beta - baselineRef.current.beta;
     const gamma = event.gamma - baselineRef.current.gamma;
     tiltRef.current = {
-      x: clamp(gamma / 24, -1, 1),
-      y: clamp(beta / 24, -1, 1),
+      x: clamp(gamma / 12, -1, 1),
+      y: clamp(beta / 12, -1, 1),
     };
   }, []);
 
