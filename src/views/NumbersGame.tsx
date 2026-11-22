@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './NumbersGame.module.css';
 import { playSuccessSound, playErrorSound, playPopSound } from '../utils/audio';
 
 const NumbersGame: React.FC = () => {
-  const [sequence, setSequence] = useState<(number | null)[]>([]);
-  const [options, setOptions] = useState<number[]>([]);
+  const [sequence, setSequence] = useState<(number | null)[]>([1, null, null, 4]);
+  const [options, setOptions] = useState<number[]>([3, 2]);
   const [errorIndex, setErrorIndex] = useState<number | null>(null);
   const [message, setMessage] = useState('Complete a sequência! 🚂');
   
@@ -27,11 +27,7 @@ const NumbersGame: React.FC = () => {
     setMessage('Complete a sequência! 🚂');
   };
 
-  useEffect(() => {
-    initGame();
-  }, []);
-
-  const handleDrop = (num: number, index: number) => {
+  const handleDrop = useCallback((num: number, index: number) => {
     const start = sequence.find(n => n !== null)! - sequence.indexOf(sequence.find(n => n !== null)!);
     const expected = start + index;
 
@@ -52,12 +48,13 @@ const NumbersGame: React.FC = () => {
       setMessage('Tente outro número! 😊');
       setTimeout(() => setErrorIndex(null), 400);
     }
-  };
+  }, [sequence]);
 
   const onPointerDown = (e: React.PointerEvent, num: number) => {
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     
+    e.currentTarget.setPointerCapture(e.pointerId);
     setDraggingNumber({
       value: num,
       x: rect.left,
@@ -67,19 +64,17 @@ const NumbersGame: React.FC = () => {
     });
     
     playPopSound(500);
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   };
 
-  const onPointerMove = (e: PointerEvent) => {
-    if (!draggingNumber) return;
+  const onPointerMove = useCallback((e: PointerEvent) => {
     setDraggingNumber(prev => prev ? {
       ...prev,
       x: e.clientX - prev.startX,
       y: e.clientY - prev.startY
     } : null);
-  };
+  }, []);
 
-  const onPointerUp = (e: PointerEvent) => {
+  const onPointerUp = useCallback((e: PointerEvent) => {
     if (!draggingNumber) return;
 
     let matchedIndex: number | null = null;
@@ -103,7 +98,7 @@ const NumbersGame: React.FC = () => {
       handleDrop(draggingNumber.value, matchedIndex);
     }
     setDraggingNumber(null);
-  };
+  }, [draggingNumber, handleDrop]);
 
   useEffect(() => {
     if (draggingNumber) {
@@ -114,7 +109,7 @@ const NumbersGame: React.FC = () => {
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
     };
-  }, [draggingNumber]);
+  }, [draggingNumber, onPointerMove, onPointerUp]);
 
   return (
     <div className={styles.container} style={{ touchAction: 'none' }}>
