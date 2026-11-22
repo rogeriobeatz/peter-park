@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styles from './ShapesGame.module.css';
 import { playSuccessSound, playPopSound } from '../../utils/audio';
 
@@ -19,8 +19,8 @@ const ALL_SHAPES: Shape[] = [
 ];
 
 const ShapesGame: React.FC = () => {
-  const [currentShapes, setCurrentShapes] = useState<Shape[]>([]);
-  const [shuffledShapes, setShuffledShapes] = useState<Shape[]>([]);
+  const [currentShapes, setCurrentShapes] = useState<Shape[]>(() => ALL_SHAPES.slice(0, 4));
+  const [shuffledShapes, setShuffledShapes] = useState<Shape[]>(() => ALL_SHAPES.slice(0, 4).reverse());
   const [placed, setPlaced] = useState<Record<string, boolean>>({});
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
@@ -38,12 +38,9 @@ const ShapesGame: React.FC = () => {
     setDragId(null);
   }, []);
 
-  useEffect(() => {
-    initGame();
-  }, [initGame]);
-
   const handlePointerDown = (e: React.PointerEvent, id: string) => {
     if (placed[id]) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
     setDragId(id);
     setDragPos({ x: e.clientX, y: e.clientY });
     playPopSound(600);
@@ -92,7 +89,7 @@ const ShapesGame: React.FC = () => {
       className={styles.container}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
       <header className={styles.header}>
         <div className={styles.titleCard}>
