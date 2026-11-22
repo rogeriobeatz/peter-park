@@ -39,7 +39,7 @@ const MemoryGame: React.FC = () => {
   }, []);
 
   const scheduleTimeout = (callback: () => void, delay: number) => {
-    const timer = window.scheduleTimeout(() => {
+    const timer = window.setTimeout(() => {
       timeoutRefs.current = timeoutRefs.current.filter(id => id !== timer);
       callback();
     }, delay);
@@ -75,7 +75,7 @@ const MemoryGame: React.FC = () => {
 
     if (card1 && card2 && card1.emoji === card2.emoji) {
       // SUCESSO!
-      setTimeout(() => {
+      scheduleTimeout(() => {
         playSuccessSound();
         setCards(prev => prev.map(c => 
           ids.includes(c.id) ? { ...c, isMatched: true } : c
