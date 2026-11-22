@@ -45,17 +45,19 @@ export function stepBall(
 ): MazeVector {
   const dt = Math.min(Math.max(deltaSeconds, 0), 0.04);
   const radius = 0.22;
-  const acceleration = 5.2;
-  const friction = Math.pow(0.91, dt * 60);
-  const maxSpeed = 3.0;
-
-  let vx = (current.vx + tilt.x * acceleration * dt) * friction;
-  let vy = (current.vy + tilt.y * acceleration * dt) * friction;
-  const speed = Math.hypot(vx, vy);
-  if (speed > maxSpeed) {
-    vx = (vx / speed) * maxSpeed;
-    vy = (vy / speed) * maxSpeed;
+  // Direct tilt control: the ball quickly tracks the sensor instead of slowly accelerating.
+  const maxSpeed = 7.5;
+  const response = 1 - Math.exp(-dt * 18);
+  let targetX = tilt.x * maxSpeed;
+  let targetY = tilt.y * maxSpeed;
+  const targetSpeed = Math.hypot(targetX, targetY);
+  if (targetSpeed > maxSpeed) {
+    targetX = (targetX / targetSpeed) * maxSpeed;
+    targetY = (targetY / targetSpeed) * maxSpeed;
   }
+
+  let vx = current.vx + (targetX - current.vx) * response;
+  let vy = current.vy + (targetY - current.vy) * response;
 
   let x = current.x + vx * dt;
   if (collides(x, current.y, radius)) {
