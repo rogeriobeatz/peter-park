@@ -63,7 +63,7 @@ export function stepRings(rings: AquaRing[], deltaSeconds: number): { rings: Aqu
     let vy = ring.vy + 82 * dt;
     let x = ring.x + vx * dt;
     let y = ring.y + vy * dt;
-    let angle = ring.angle + vx * dt * 0.42;
+    const angle = ring.angle + vx * dt * 0.42;
 
     if (x < 9 || x > 91) {
       x = clamp(x, 9, 91);
