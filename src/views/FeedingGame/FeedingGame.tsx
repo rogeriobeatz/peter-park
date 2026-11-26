@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styles from './FeedingGame.module.css';
 import { playSuccessSound, playPopSound, playErrorSound } from '../../utils/audio';
 
@@ -24,7 +24,7 @@ const ANIMALS: Animal[] = [
 ];
 
 const FeedingGame: React.FC = () => {
-  const [currentFoods, setCurrentFoods] = useState<FoodItem[]>([]);
+  const [currentFoods, setCurrentFoods] = useState<FoodItem[]>(() => ANIMALS.map((animal, index) => ({ id: index + 1, emoji: animal.food, targetAnimal: animal.id })));
   const [fed, setFed] = useState<Record<string, boolean>>({});
   const [dragItem, setDragItem] = useState<FoodItem | null>(null);
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 });
@@ -44,11 +44,8 @@ const FeedingGame: React.FC = () => {
     setDragItem(null);
   }, []);
 
-  useEffect(() => {
-    initGame();
-  }, [initGame]);
-
   const handlePointerDown = (e: React.PointerEvent, item: FoodItem) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
     setDragItem(item);
     setDragPos({ x: e.clientX, y: e.clientY });
     playPopSound(600);
@@ -108,7 +105,7 @@ const FeedingGame: React.FC = () => {
       className={styles.container}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      onPointerCancel={handlePointerUp}
     >
       <header className={styles.header}>
         <div className={styles.titleCard}>

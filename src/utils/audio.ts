@@ -5,7 +5,7 @@ let audioCtx: AudioContext | null = null;
 
 const initAudio = () => {
   if (!audioCtx) {
-    audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    audioCtx = new AudioContext();
   }
   if (audioCtx.state === 'suspended') {
     audioCtx.resume();
