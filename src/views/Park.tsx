@@ -8,6 +8,7 @@ interface ParkProps {
 
 const GAMES = [
   { id: 'bolhas', title: 'Bolhas', icon: '🫧', color: '#96CEB4' },
+  { id: 'aquaplay', title: 'Aquaplay', icon: '🐠', color: '#54CFE7' },
   { id: 'memoria', title: 'Memória', icon: '🦖', color: '#4ECDC4' },
   { id: 'comida', title: 'Comida', icon: '🍎', color: '#FFEEAD' },
   { id: 'formas', title: 'Encaixe', icon: '🔵', color: '#FF6B6B' },
@@ -22,11 +23,10 @@ const GAMES = [
 const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
   return (
     <div className={styles.container}>
-      {/* Background Decor */}
       <div className={styles.sky}>
         <div className={styles.sun}>☀️</div>
-        <div className={`${styles.cloud} ${styles.cloud1}`}>☁️</div>
-        <div className={`${styles.cloud} ${styles.cloud2}`}>☁️</div>
+        <div className={styles.cloud + ' ' + styles.cloud1}>☁️</div>
+        <div className={styles.cloud + ' ' + styles.cloud2}>☁️</div>
         <div className={styles.bird}>🐦</div>
       </div>
 
@@ -54,11 +54,10 @@ const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
         </main>
       </div>
 
-      {/* Foreground Decor */}
       <div className={styles.nature}>
         <div className={styles.grass}></div>
         <div className={styles.butterfly}>🦋</div>
-        <div className={`${styles.butterfly} ${styles.butterfly2}`}>🦋</div>
+        <div className={styles.butterfly + ' ' + styles.butterfly2}>🦋</div>
         <div className={styles.flowers}>🌸🌼🌺</div>
         <div className={styles.pets}>🐶🐱🐰</div>
       </div>
