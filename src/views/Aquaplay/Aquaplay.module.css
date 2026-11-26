@@ -1,152 +1,83 @@
 .game{
-  --ocean:#18b9de;
-  width:100%;
-  height:100%;
-  min-height:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:clamp(7px,1.3vh,14px);
-  padding:calc(9px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
-  overflow:hidden;
-  color:#14577a;
-  background:
-    radial-gradient(ellipse at 12% 8%,#ffffff8c 0 3%,transparent 24%),
-    linear-gradient(160deg,#d9f7ff 0%,#9ce9f7 48%,#76d5e9 100%);
-  touch-action:manipulation;
+  position:relative;isolation:isolate;width:100%;height:100%;min-height:0;
+  display:flex;flex-direction:column;align-items:center;gap:clamp(5px,1vh,10px);
+  padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+  overflow:hidden;color:#f7ffff;background:#0a769a;touch-action:manipulation;
 }
-.topBar{
-  width:min(100%,720px);
-  min-height:clamp(52px,8vh,70px);
-  display:grid;
-  grid-template-columns:auto 1fr auto;
-  align-items:center;
-  gap:clamp(7px,2vw,16px);
-  flex-shrink:0;
-}
-.homeButton,.soundButton{
-  width:clamp(42px,8vw,58px);
-  height:clamp(42px,8vw,58px);
-  display:grid;
-  place-items:center;
-  border:3px solid #fff;
-  border-radius:18px;
-  background:linear-gradient(#fff,#e5faff);
-  box-shadow:0 5px 0 #65b7d0,0 8px 16px #317e9930;
-  font-size:clamp(23px,5vw,31px);
-}
-.brand{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0}
-.brandIcon{font-size:clamp(28px,6vw,42px);animation:fishWiggle 2.2s ease-in-out infinite}
-.brand h1{margin:0;color:#0879a7;font-size:clamp(22px,5.6vw,36px);line-height:.95;font-weight:900;letter-spacing:.06em;text-shadow:0 2px #fff}
-.brand p{margin:4px 0 0;color:#267b99;font-size:clamp(8px,2vw,11px);font-weight:800;letter-spacing:.06em;white-space:nowrap}
-.topActions{display:flex;align-items:center;gap:6px}
-.score{display:flex;align-items:center;gap:4px;padding:7px 10px;border:3px solid #fff;border-radius:16px;background:#ffffffd9;box-shadow:0 4px 0 #65b7d0;color:#e69a1e;font-size:clamp(14px,3vw,21px);white-space:nowrap}
-.score strong{color:#17688c}
-.soundButton{font-size:clamp(18px,4vw,25px)}
-.playArea{width:100%;max-width:620px;min-height:0;flex:1;display:flex;align-items:stretch;justify-content:center}
-.tank{
-  position:relative;
-  width:100%;
-  min-height:0;
-  overflow:hidden;
-  isolation:isolate;
-  border:clamp(7px,1.6vw,11px) solid #f8ffff;
-  border-radius:clamp(28px,7vw,46px);
-  background:
-    radial-gradient(ellipse at 18% 18%,#e7ffff8a 0 5%,transparent 29%),
-    radial-gradient(ellipse at 84% 32%,#b3f5ff6e 0 8%,transparent 34%),
-    linear-gradient(180deg,#70e3f4 0%,#37c6e5 38%,#159ec9 100%);
-  box-shadow:inset 0 0 0 3px #4dbed9, inset 0 -24px 40px #007ea033,0 9px 0 #5ba9c3,0 18px 32px #287f9c35;
-}
-.tank:before{
-  content:"";position:absolute;inset:0;z-index:-1;opacity:.22;pointer-events:none;
-  background-image:radial-gradient(#fff 1.3px,transparent 1.5px);
-  background-size:27px 31px;
-}
-.tankShine{position:absolute;z-index:1;top:0;left:7%;width:9%;height:100%;border-radius:50%;background:linear-gradient(90deg,#fff6,transparent);filter:blur(8px);pointer-events:none}
-.waterSurface{position:absolute;top:7%;left:-5%;width:110%;height:17px;display:flex;justify-content:space-around;opacity:.45}
-.waterSurface span{width:34%;height:13px;border-top:4px solid #e9ffff;border-radius:50%;animation:surfaceWave 2.6s ease-in-out infinite}
-.waterSurface span:nth-child(2){animation-delay:-.8s}.waterSurface span:nth-child(3){animation-delay:-1.5s}
-.sunRays{position:absolute;top:5%;right:8%;font-size:clamp(24px,6vw,42px);opacity:.5;animation:sunPulse 4s ease-in-out infinite}
-.target{position:absolute;z-index:2;top:17%;width:18%;height:22%;display:flex;justify-content:center;pointer-events:none}
-.targetLeft{left:19%}.targetRight{right:19%}
-.target i{position:absolute;top:0;width:14px;height:100%;border:3px solid #e1fdff;border-radius:999px;background:linear-gradient(90deg,#ffffff,#a6e8f3 45%,#ffffff);box-shadow:0 0 0 3px #1487b2,0 4px 7px #006c9755}
-.target span{position:absolute;top:-22px;font-size:clamp(19px,4.5vw,28px);filter:drop-shadow(0 2px 1px #fff)}
-.ringSlot{position:absolute;z-index:4;width:1px;height:1px;transition:filter .15s}
-.ring{position:absolute;width:clamp(34px,9vw,53px);height:clamp(34px,9vw,53px);border:9px solid;border-radius:50%;background:#ffffff12;box-shadow:inset 0 0 0 3px #ffffff66,0 3px 8px #005e8752,0 0 12px #ffffff6b;filter:drop-shadow(0 3px 2px #086d8d55)}
-.ringSlot:has(.ring[style*="opacity: 1"]){filter:drop-shadow(0 0 8px #fff)}
-.ringSparkle{position:absolute;top:-20px;right:-15px;font-size:20px;animation:sparkle .8s ease-in-out infinite alternate}
-.fish,.turtle,.jellyfish,.octopus,.dolphin{position:absolute;z-index:3;pointer-events:none;filter:drop-shadow(0 3px 2px #006b8c45)}
-.fish{font-size:clamp(25px,6vw,40px)}
-.fishOne{top:43%;left:7%;animation:swim 10s ease-in-out infinite}
-.fishTwo{top:55%;right:7%;font-size:clamp(22px,5vw,34px);animation:swimBack 12s ease-in-out infinite}
-.turtle{top:39%;right:18%;font-size:clamp(29px,6vw,42px);animation:turtleFloat 5s ease-in-out infinite}
-.jellyfish{top:47%;left:20%;font-size:clamp(27px,6vw,41px);animation:jellyFloat 3.4s ease-in-out infinite}
-.octopus{bottom:16%;left:12%;font-size:clamp(28px,7vw,46px);animation:octoDance 3s ease-in-out infinite}
-.dolphin{top:31%;right:6%;font-size:clamp(31px,7vw,48px);animation:dolphinLeap 5s ease-in-out infinite}
-.seaweed{position:absolute;z-index:2;bottom:7%;left:3%;font-size:clamp(28px,7vw,45px);opacity:.9;transform-origin:bottom;animation:seaweedSway 3s ease-in-out infinite}
-.coral{position:absolute;z-index:2;right:4%;bottom:7%;font-size:clamp(31px,7vw,48px);filter:drop-shadow(0 3px 2px #006b8c45)}
-.floor{position:absolute;z-index:1;left:-10%;bottom:-5%;width:120%;height:17%;border-radius:50% 50% 0 0;background:linear-gradient(#f4d99c,#d9ae6b 80%);box-shadow:0 -5px 12px #ffffff4c}
-.floor:before{content:"";position:absolute;top:12%;left:10%;width:80%;height:4px;border-radius:50%;background:#fff9cf}
-.tankLabel{position:absolute;z-index:3;bottom:8%;left:50%;transform:translateX(-50%);padding:5px 11px;border:2px solid #ffffffa6;border-radius:999px;background:#ffffffa6;color:#23829c;font-size:clamp(8px,1.8vw,11px);font-weight:900;letter-spacing:.08em;white-space:nowrap}
-.burstBubble{position:absolute;z-index:5;top:78%;width:12px;height:12px;border:2px solid #edffff;border-radius:50%;background:#c7f8ff8c;box-shadow:inset 2px 2px 2px #fff;animation:jetBubble .72s ease-out both;animation-delay:var(--bubble-delay)}
-.burstBubble:nth-of-type(odd){width:8px;height:8px}
-.controls{width:100%;max-width:620px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:clamp(5px,1vh,10px)}
-.controlHint{color:#1c7592;font-size:clamp(9px,2.3vw,12px);font-weight:900;letter-spacing:.035em;text-align:center}
-.buttonRow{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,3vw,18px)}
-.pumpButton{
-  position:relative;min-width:0;min-height:clamp(74px,12.5vh,112px);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
-  overflow:hidden;border:4px solid #fff;border-radius:clamp(20px,5vw,31px);
-  color:#fff;text-shadow:0 2px 2px #145c796b;
-  box-shadow:0 7px 0 #167d9f,0 12px 20px #176d9140,inset 0 3px 4px #ffffff8a;
-  touch-action:none;user-select:none;-webkit-user-select:none;
-  transition:transform .12s ease,filter .12s ease;
-}
-.leftPump{background:linear-gradient(160deg,#ff9a9c 0%,#f15b7b 58%,#d94668 100%)}
-.rightPump{background:linear-gradient(160deg,#70e9e1 0%,#29bdc5 58%,#1595ae 100%)}
-.pumpButton:before{content:"";position:absolute;inset:5px;border:2px solid #ffffff52;border-radius:18px;pointer-events:none}
-.pumpButton:active,.pumping{transform:translateY(5px) scale(.985);filter:brightness(1.12);box-shadow:0 2px 0 #167d9f,0 5px 10px #176d9140,inset 0 3px 4px #ffffff8a}
-.buttonSplash{font-size:clamp(26px,6vh,43px);line-height:1.02;filter:drop-shadow(0 2px 2px #145c7955);transition:transform .15s}
-.pumping .buttonSplash{animation:buttonSplash .34s ease-in-out infinite alternate}
-.buttonLabel{font-size:clamp(12px,3.2vw,18px);font-weight:900;letter-spacing:.07em;line-height:1.2}
-.buttonHint{font-size:clamp(8px,2vw,10px);font-weight:800;letter-spacing:.17em;opacity:.82}
-.footerMeta{color:#3184a0;font-size:clamp(8px,1.9vw,10px);font-weight:800;letter-spacing:.12em;text-align:center}
-.footerMeta span{padding:0 5px;color:#fff}
-.celebration{position:absolute;z-index:10;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(7px,2vh,14px);padding:20px;background:#087ca5c9;backdrop-filter:blur(3px);color:#fff;text-align:center;animation:celebrateIn .35s cubic-bezier(.2,1.5,.4,1) both}
-.celebration div:first-child{font-size:clamp(44px,11vw,76px);animation:partyAnimals .8s ease-in-out infinite alternate}
-.celebration strong{font-size:clamp(24px,6vw,38px);font-weight:900;text-shadow:0 3px 0 #075a7c}
+.sceneImage{position:absolute;z-index:-3;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 52%;filter:saturate(1.08) contrast(1.02);transform:scale(1.025);pointer-events:none}
+.waterWash{position:absolute;z-index:-2;inset:0;background:linear-gradient(180deg,#001e4d2e 0%,#00638529 38%,#00425d61 100%),radial-gradient(ellipse at 50% 36%,transparent 0%,#004b6a24 75%);pointer-events:none}
+.ambientBubbles{position:absolute;z-index:-1;inset:0;overflow:hidden;pointer-events:none;opacity:.56}
+.ambientBubbles i{position:absolute;left:calc((var(--bubble-index)*8.3%) + 2%);bottom:-28px;width:clamp(5px,1.5vw,10px);height:clamp(5px,1.5vw,10px);border:1px solid #eaffff;border-radius:50%;box-shadow:inset 1px 1px 2px #fff;animation:ambientRise calc(8s + var(--bubble-index)*.7s) linear infinite;animation-delay:calc(var(--bubble-index)*-.83s)}
+.topBar{position:relative;z-index:12;width:min(100%,740px);min-height:clamp(44px,7.2vh,64px);display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(7px,2vw,16px);flex-shrink:0}
+.homeButton{width:clamp(42px,8vw,57px);height:clamp(42px,8vw,57px);display:grid;place-items:center;border:3px solid #fff;border-radius:17px;background:linear-gradient(#fff,#e4fbff);box-shadow:0 5px 0 #176d8d,0 8px 14px #002e4c55;color:#125c79;font-size:clamp(22px,4.8vw,31px)}
+.brand{display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;text-shadow:0 2px 3px #003b60aa}
+.brandIcon{font-size:clamp(27px,5.5vw,41px);animation:fishWiggle 2.2s ease-in-out infinite;filter:drop-shadow(0 2px 2px #003b60)}
+.brand h1{margin:0;color:#fff;font-size:clamp(20px,5.1vw,34px);line-height:.9;font-weight:900;letter-spacing:.08em}
+.brand p{margin:4px 0 0;color:#e8fdff;font-size:clamp(8px,1.85vw,11px);font-weight:900;letter-spacing:.1em;white-space:nowrap}
+.score{display:flex;align-items:center;justify-content:center;gap:5px;min-width:clamp(57px,13vw,82px);padding:8px 9px;border:3px solid #fff;border-radius:16px;background:linear-gradient(#fff,#e5fbff);box-shadow:0 5px 0 #176d8d,0 8px 14px #002e4c55;color:#efa826;font-size:clamp(14px,3.4vw,22px)}
+.score strong{color:#126b8a}
+.scenePicker{position:relative;z-index:12;width:min(100%,550px);display:flex;justify-content:center;gap:clamp(5px,1.8vw,10px);flex-shrink:0}
+.scenePicker button{min-width:0;display:flex;align-items:center;justify-content:center;gap:5px;padding:5px clamp(7px,2vw,12px);border:2px solid #ffffffa8;border-radius:999px;background:#073d5f72;color:#f5ffff;box-shadow:0 3px 8px #00334a44;backdrop-filter:blur(6px);opacity:.82}
+.scenePicker button span{font-size:clamp(14px,3.4vw,19px)}
+.scenePicker button small{font-size:clamp(8px,1.9vw,10px);font-weight:800;white-space:nowrap}
+.scenePicker button.sceneActive{border-color:#fff;background:#fff;color:#116783;opacity:1;box-shadow:0 3px 0 #73d3e3,0 7px 14px #00334a4c}
+.playArea{position:relative;z-index:1;width:100%;max-width:740px;min-height:0;flex:1;display:flex;align-items:stretch;justify-content:center;padding:1px 0 2px}
+.tank{position:relative;width:100%;min-height:0;overflow:hidden;isolation:isolate;border:clamp(5px,1.5vw,10px) solid #f2ffff;border-radius:clamp(25px,6vw,43px);background:linear-gradient(180deg,#62d6e946 0%,#0c9fcb28 48%,#0c6e9944 100%),radial-gradient(ellipse at 50% 50%,#c0faff14,transparent 70%);box-shadow:inset 0 0 0 2px #54d7e5,inset 0 0 36px #003d5a60,0 8px 0 #176a89,0 15px 26px #002f4c4d}
+.tank:before{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;opacity:.28;background-image:radial-gradient(circle at 12% 21%,#fff 0 1px,transparent 2px),radial-gradient(circle at 75% 38%,#e8ffff 0 1px,transparent 2px),radial-gradient(circle at 32% 62%,#fff 0 1px,transparent 2px);background-size:46px 55px,67px 73px,59px 64px}
+.glassGlare{position:absolute;z-index:9;inset:0 auto 0 3%;width:8%;border-radius:50%;background:linear-gradient(90deg,#fff5,transparent);filter:blur(8px);opacity:.55;pointer-events:none}
+.waterLine{position:absolute;z-index:2;top:6%;left:-4%;width:108%;height:19px;display:flex;justify-content:space-around;opacity:.6;pointer-events:none}
+.waterLine i{width:34%;height:13px;border-top:3px solid #e8ffff;border-radius:50%;animation:waterWobble 2.8s ease-in-out infinite}
+.waterLine i:nth-child(2){animation-delay:-.9s}.waterLine i:nth-child(3){animation-delay:-1.8s}
+.target{position:absolute;z-index:3;top:17%;width:17%;height:18%;display:flex;justify-content:center;pointer-events:none;filter:drop-shadow(0 5px 3px #002b4760)}
+.targetLeft{left:19.5%}.targetRight{right:19.5%}
+.targetHalo{position:absolute;top:0;width:clamp(39px,11vw,61px);height:clamp(24px,6vw,35px);border:clamp(5px,1.2vw,8px) solid #fbffff;border-radius:50%;transform:perspective(90px) rotateX(60deg);background:radial-gradient(ellipse,#092d4066 0%,#4bd5e722 54%,transparent 72%);box-shadow:0 0 0 3px #1b7893,inset 0 2px 4px #fff,0 6px 9px #002a3e77}
+.targetPost{position:absolute;top:16%;width:clamp(7px,1.8vw,11px);height:85%;border:2px solid #efffff;border-radius:999px;background:linear-gradient(90deg,#8ab9c6,#f5ffff 48%,#76b7c4);box-shadow:inset -2px 0 2px #236b84,0 2px 4px #002d4a77}
+.target b{position:absolute;top:-22px;font-size:clamp(15px,3.7vw,22px);filter:drop-shadow(0 2px 2px #00334a)}
+.depthGuide{position:absolute;z-index:3;top:42%;left:50%;transform:translateX(-50%);width:max-content;max-width:90%;padding:4px 9px;border:1px solid #ffffff80;border-radius:999px;background:#063c5b55;color:#edffff;font-size:clamp(7px,1.6vw,9px);font-weight:900;letter-spacing:.09em;text-shadow:0 1px 2px #00334a;pointer-events:none}
+.depthGuide span{padding:0 4px;color:#a9f2ff}
+.ringSlot{position:absolute;z-index:4;width:1px;height:1px;pointer-events:none;transition:filter .15s}
+.ring3d{position:absolute;left:0;top:0;width:clamp(34px,9vw,53px);height:clamp(29px,7vw,42px);border:clamp(6px,1.5vw,9px) solid var(--ring-color);border-radius:50%;background:radial-gradient(ellipse at 34% 24%,#ffffffa5 0 6%,transparent 33%),linear-gradient(145deg,#ffffff56 0%,#ffffff08 34%,#001e3c55 100%);box-shadow:inset 0 4px 3px #ffffffcf,inset 0 -6px 5px #002a4777,0 3px 0 #001c3866,0 6px 6px #00294266,0 0 0 1px #ffffffa8;transform:translate(-50%,-50%) perspective(145px) rotateX(calc(64deg + var(--ring-tilt))) rotateY(calc(var(--ring-depth)*16deg)) rotateZ(var(--ring-spin)) scale(calc(.76 + var(--ring-depth)*.42));transform-style:preserve-3d;filter:drop-shadow(0 2px 1px #00314a66)}
+.ring3d:before{content:"";position:absolute;inset:-5px;border:2px solid #ffffff8c;border-right-color:#062d4d70;border-bottom-color:#0428449c;border-radius:50%;transform:translateZ(4px);box-shadow:inset 0 1px 2px #fff}
+.ring3d:after{content:"";position:absolute;inset:5px;border:2px solid #ffffff94;border-left-color:#002d4a66;border-top-color:#ffffffcc;border-radius:50%;transform:translateZ(-4px)}
+.ringHole{position:absolute;inset:6px;border-radius:50%;background:radial-gradient(ellipse at 33% 27%,#d8fbff7a,#00345166 72%);box-shadow:inset 0 3px 4px #001d356e,0 1px 0 #ffffff8a;transform:translateZ(1px)}
+.ringShadow{position:absolute;left:50%;top:10px;width:clamp(26px,7vw,42px);height:clamp(9px,2.5vw,15px);border-radius:50%;background:#002f4b60;filter:blur(5px);transform:translateX(-50%) rotateX(70deg) scale(calc(.72 + var(--ring-depth)*.48))}
+.ringCaught{filter:drop-shadow(0 0 9px #fff) drop-shadow(0 0 13px #ffd44a)}
+.ringCaught .ring3d{animation:ringSnap .44s cubic-bezier(.2,1.6,.4,1) both}
+.ringMissed .ring3d{animation:ringMiss .34s ease-out}
+.ringSparkle{position:absolute;top:-16px;right:-15px;font-size:18px;transform:translateZ(12px);animation:sparkle .7s ease-in-out infinite alternate}
+.burstBubble{position:absolute;z-index:8;bottom:8%;width:10px;height:10px;border:2px solid #efffff;border-radius:50%;background:#b9f5ff6e;box-shadow:inset 2px 2px 2px #fff;animation:jetBubble .7s ease-out both;animation-delay:var(--bubble-delay)}
+.burstBubble:nth-of-type(odd){width:7px;height:7px}
+.tankFrameBottom{position:absolute;z-index:2;left:-8%;bottom:-7%;width:116%;height:13%;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#d6faff36,#003d6250);border-top:2px solid #ddffff66;pointer-events:none}
+.controls{position:relative;z-index:12;width:min(100%,740px);flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:clamp(4px,.8vh,8px)}
+.controlHint{min-height:17px;padding:2px 10px;color:#fff;font-size:clamp(9px,2.3vw,12px);font-weight:900;text-align:center;letter-spacing:.04em;text-shadow:0 2px 4px #00324f}
+.buttonRow{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:clamp(9px,3vw,17px)}
+.pumpButton{position:relative;min-width:0;min-height:clamp(72px,12vh,104px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;border:4px solid #fff;border-radius:clamp(20px,5vw,30px);color:#fff;text-shadow:0 2px 3px #003c5b88;box-shadow:0 7px 0 #104f71,0 12px 19px #00324d66,inset 0 3px 4px #ffffffa6;touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .1s ease,filter .1s ease}
+.leftPump{background:linear-gradient(155deg,#ff9eae 0%,#ef5b7c 57%,#c93b65 100%)}
+.rightPump{background:linear-gradient(155deg,#7dece4 0%,#27bcc7 57%,#0b829f 100%)}
+.pumpButton:before{content:"";position:absolute;inset:5px;border:2px solid #ffffff66;border-radius:17px;pointer-events:none}
+.pumpButton:active,.pumping{transform:translateY(5px) scale(.985);filter:brightness(1.13);box-shadow:0 2px 0 #104f71,0 5px 10px #00324d55,inset 0 3px 4px #ffffffa6}
+.buttonIcon{font-size:clamp(25px,5.5vh,40px);line-height:1.05;filter:drop-shadow(0 2px 2px #003c5b66)}
+.pumping .buttonIcon{animation:pumpThrob .3s ease-in-out infinite alternate}
+.buttonLabel{font-size:clamp(12px,3.2vw,18px);font-weight:900;letter-spacing:.08em}
+.buttonHint{font-size:clamp(8px,1.8vw,10px);font-weight:800;letter-spacing:.12em;opacity:.86}
+.footerMeta{color:#f1ffff;font-size:clamp(8px,1.8vw,10px);font-weight:900;letter-spacing:.13em;text-align:center;text-shadow:0 1px 3px #00324f}
+.footerMeta span{padding:0 5px;color:#b6f5ff}
+.celebration{position:absolute;z-index:20;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(7px,2vh,14px);padding:20px;background:#075d83cf;backdrop-filter:blur(4px);color:#fff;text-align:center;animation:celebrateIn .35s cubic-bezier(.2,1.5,.4,1) both}
+.celebrationAnimals{font-size:clamp(42px,10vw,72px);animation:partyAnimals .8s ease-in-out infinite alternate}
+.celebration strong{font-size:clamp(22px,5.5vw,36px);font-weight:900;text-shadow:0 3px 0 #064364}
 .celebration span{font-size:clamp(12px,3vw,17px);font-weight:700}
-.confetti{font-size:clamp(21px,5vw,35px);animation:confettiWiggle .8s ease-in-out infinite alternate}
-@keyframes swim{0%,100%{transform:translate(0,0) scaleX(1)}48%{transform:translate(60px,-10px) scaleX(1)}50%{transform:translate(60px,-10px) scaleX(-1)}98%{transform:translate(0,0) scaleX(-1)}}
-@keyframes swimBack{0%,100%{transform:translate(0,0) scaleX(-1)}50%{transform:translate(-55px,13px) scaleX(-1)}51%{transform:translate(-55px,13px) scaleX(1)}}
-@keyframes turtleFloat{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-12px) rotate(8deg)}}
-@keyframes jellyFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-18px) scale(1.08,.94)}}
-@keyframes octoDance{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-9px) rotate(6deg)}}
-@keyframes dolphinLeap{0%,78%,100%{transform:translateY(0) rotate(0)}86%{transform:translateY(-24px) rotate(-15deg)}92%{transform:translateY(-9px) rotate(10deg)}}
-@keyframes seaweedSway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
-@keyframes surfaceWave{0%,100%{transform:translateY(0) scaleX(.85)}50%{transform:translateY(4px) scaleX(1.08)}}
-@keyframes sunPulse{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.12) rotate(5deg)}}
-@keyframes sparkle{from{transform:scale(.7) rotate(-18deg);opacity:.5}to{transform:scale(1.25) rotate(18deg);opacity:1}}
-@keyframes jetBubble{0%{transform:translate(0,24px) scale(.5);opacity:0}18%{opacity:1}100%{transform:translate(var(--bubble-offset),-220px) scale(1.5);opacity:0}}
-@keyframes buttonSplash{from{transform:translateY(2px) scale(.9)}to{transform:translateY(-5px) scale(1.12)}}
-@keyframes celebrateIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
-@keyframes partyAnimals{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-12px) rotate(4deg)}}
+.confetti{font-size:clamp(21px,5vw,34px);animation:confettiWiggle .8s ease-in-out infinite alternate}
+@keyframes ambientRise{0%{transform:translate3d(0,0,0) scale(.6);opacity:0}10%{opacity:.8}90%{opacity:.45}100%{transform:translate3d(20px,-110vh,0) scale(1.2);opacity:0}}
+@keyframes waterWobble{0%,100%{transform:translateY(0) scaleX(.86)}50%{transform:translateY(4px) scaleX(1.08)}}
+@keyframes jetBubble{0%{transform:translate(0,18px) scale(.4);opacity:0}18%{opacity:1}100%{transform:translate(var(--bubble-offset),-210px) scale(1.55);opacity:0}}
+@keyframes sparkle{from{transform:translateZ(12px) scale(.7) rotate(-16deg);opacity:.6}to{transform:translateZ(12px) scale(1.25) rotate(16deg);opacity:1}}
+@keyframes ringSnap{0%{transform:translate(-50%,-50%) perspective(145px) rotateX(64deg) scale(.7)}65%{transform:translate(-50%,-50%) perspective(145px) rotateX(64deg) scale(1.15)}100%{transform:translate(-50%,-50%) perspective(145px) rotateX(64deg) scale(1)}}
+@keyframes ringMiss{0%{filter:brightness(1.4)}100%{filter:brightness(.9)}}
+@keyframes pumpThrob{from{transform:translateY(1px) scale(.9)}to{transform:translateY(-4px) scale(1.1)}}
+@keyframes celebrateIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes partyAnimals{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-11px) rotate(4deg)}}
 @keyframes confettiWiggle{from{transform:rotate(-5deg) scale(.95)}to{transform:rotate(5deg) scale(1.05)}}
 @keyframes fishWiggle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
-@media (min-width:760px) and (orientation:landscape){
-  .game{padding-top:calc(12px + env(safe-area-inset-top))}
-  .playArea,.controls{max-width:760px}
-  .tank{max-width:680px}
-}
-@media (max-height:640px){
-  .game{gap:5px}
-  .topBar{min-height:45px}
-  .homeButton,.soundButton{width:42px;height:42px;border-radius:14px}
-  .pumpButton{min-height:66px}
-  .controlHint{font-size:9px}
-  .footerMeta{font-size:8px}
-}
-@media (prefers-reduced-motion:reduce){
-  .game *,.game *:before,.game *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}
-}
+@media (min-width:760px) and (orientation:landscape){.game{padding-top:calc(10px + env(safe-area-inset-top))}.playArea,.controls{max-width:760px}.tank{max-width:690px}}
+@media (max-height:650px){.game{gap:4px}.topBar{min-height:41px}.homeButton{width:40px;height:40px;border-radius:14px}.scenePicker button{padding-block:3px}.playArea{min-height:160px}.pumpButton{min-height:61px}.controlHint{font-size:9px}.footerMeta{font-size:8px}.target{top:16%}}
+@media (prefers-reduced-motion:reduce){.game *,.game *:before,.game *:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}

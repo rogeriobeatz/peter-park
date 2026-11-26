@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { PointerEvent } from 'react';
+import type { PointerEvent, CSSProperties } from 'react';
 import styles from './Aquaplay.module.css';
 import { playPopSound, playSuccessSound } from '../../utils/audio';
 import {
@@ -11,61 +11,61 @@ import {
 } from '../../games/aquaplay/physics';
 
 type WaterBubble = { id: number; side: PumpDirection; offset: number };
+const SCENES = [
+  { src: '/aquaplay/scene-1.webp', label: 'Cidade coral', icon: '🏙️' },
+  { src: '/aquaplay/scene-2.webp', label: 'Mar noturno', icon: '🌌' },
+  { src: '/aquaplay/scene-3.webp', label: 'Casa abacaxi', icon: '🍍' },
+];
 
 const makeBubbleBurst = (side: PumpDirection, baseId: number): WaterBubble[] =>
-  Array.from({ length: 9 }, (_, index) => ({
+  Array.from({ length: 11 }, (_, index) => ({
     id: baseId + index,
     side,
-    offset: (index - 4) * 5 + (index % 2 ? 3 : -3),
+    offset: (index - 5) * 7 + (index % 2 ? 4 : -4),
   }));
 
 const Aquaplay = () => {
   const [rings, setRings] = useState<AquaRing[]>(createInitialRings);
   const [caughtTotal, setCaughtTotal] = useState(0);
   const [round, setRound] = useState(1);
+  const [scene, setScene] = useState(0);
   const [celebrating, setCelebrating] = useState(false);
   const [activePump, setActivePump] = useState<PumpDirection | null>(null);
   const [bubbles, setBubbles] = useState<WaterBubble[]>([]);
-  const [muted, setMuted] = useState(false);
+  const [hint, setHint] = useState('BOMBE NA HORA CERTA. SOLTE PARA ALINHAR!');
+
   const ringsRef = useRef(rings);
-  const mutedRef = useRef(muted);
   const pumpIntervalRef = useRef<number | null>(null);
-  const burstTimeoutRef = useRef<number | null>(null);
+  const bubbleTimeoutRef = useRef<number | null>(null);
+  const hintTimeoutRef = useRef<number | null>(null);
   const celebrationTimeoutRef = useRef<number | null>(null);
   const bubbleIdRef = useRef(0);
-  const musicRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    mutedRef.current = muted;
-  }, [muted]);
-
-  useEffect(() => {
-    if (musicRef.current) musicRef.current.volume = 0.12;
-  }, []);
+  const pulseRef = useRef(0);
 
   const resetRound = useCallback(() => {
     const fresh = createInitialRings();
     ringsRef.current = fresh;
     setRings(fresh);
     setCelebrating(false);
+    setScene((value) => (value + 1) % SCENES.length);
     setRound((value) => value + 1);
+    setHint('NOVO AQUÁRIO! ENCONTRE O RITMO DAS BOMBAS 🫧');
   }, []);
 
   const pump = useCallback((direction: PumpDirection) => {
-    ringsRef.current = pumpRings(ringsRef.current, direction);
-    setRings(ringsRef.current);
+    const next = pumpRings(ringsRef.current, direction, pulseRef.current);
+    pulseRef.current += 1;
+    ringsRef.current = next;
+    setRings(next);
     setActivePump(direction);
 
-    const nextId = bubbleIdRef.current;
-    bubbleIdRef.current += 9;
-    setBubbles(makeBubbleBurst(direction, nextId));
-    if (burstTimeoutRef.current !== null) window.clearTimeout(burstTimeoutRef.current);
-    burstTimeoutRef.current = window.setTimeout(() => setBubbles([]), 850);
+    const baseId = bubbleIdRef.current;
+    bubbleIdRef.current += 11;
+    setBubbles(makeBubbleBurst(direction, baseId));
+    if (bubbleTimeoutRef.current !== null) window.clearTimeout(bubbleTimeoutRef.current);
+    bubbleTimeoutRef.current = window.setTimeout(() => setBubbles([]), 760);
 
-    if (!mutedRef.current) {
-      if (musicRef.current?.paused) void musicRef.current.play().catch(() => undefined);
-      playPopSound(direction < 0 ? 390 : 520);
-    }
+    playPopSound(direction < 0 ? 390 : 520);
   }, []);
 
   const startPump = (direction: PumpDirection, event: PointerEvent<HTMLButtonElement>) => {
@@ -73,7 +73,7 @@ const Aquaplay = () => {
     event.currentTarget.setPointerCapture(event.pointerId);
     if (pumpIntervalRef.current !== null) window.clearInterval(pumpIntervalRef.current);
     pump(direction);
-    pumpIntervalRef.current = window.setInterval(() => pump(direction), 240);
+    pumpIntervalRef.current = window.setInterval(() => pump(direction), 265);
   };
 
   const stopPump = () => {
@@ -87,27 +87,36 @@ const Aquaplay = () => {
   useEffect(() => {
     let frame = 0;
     let previousTime = 0;
-    let lastPaint = 0;
+    let lastUpdate = 0;
 
     const animate = (time: number) => {
       if (!previousTime) previousTime = time;
-      const delta = (time - previousTime) / 1000;
+      const delta = Math.min((time - previousTime) / 1000, 0.05);
       previousTime = time;
 
-      if (time - lastPaint > 28 && !celebrating) {
+      if (time - lastUpdate > 32 && !celebrating) {
         const result = stepRings(ringsRef.current, delta);
         ringsRef.current = result.rings;
         setRings(result.rings);
-        lastPaint = time;
+        lastUpdate = time;
 
         if (result.caughtIds.length > 0) {
           setCaughtTotal((value) => value + result.caughtIds.length);
-          if (!mutedRef.current) playSuccessSound();
+          playSuccessSound();
           if (result.rings.every((ring) => ring.caught)) {
             setCelebrating(true);
-            if (!mutedRef.current) playSuccessSound();
-            celebrationTimeoutRef.current = window.setTimeout(resetRound, 2300);
+            playSuccessSound();
+            celebrationTimeoutRef.current = window.setTimeout(resetRound, 2700);
           }
+        }
+
+        if (result.missedIds.length > 0) {
+          setHint('PASSOU DO ARO! TENTE COM MENOS IMPULSO 🎯');
+          if (hintTimeoutRef.current !== null) window.clearTimeout(hintTimeoutRef.current);
+          hintTimeoutRef.current = window.setTimeout(
+            () => setHint('BOMBE NA HORA CERTA. SOLTE PARA ALINHAR!'),
+            1900,
+          );
         }
       }
 
@@ -120,19 +129,10 @@ const Aquaplay = () => {
 
   useEffect(() => () => {
     if (pumpIntervalRef.current !== null) window.clearInterval(pumpIntervalRef.current);
-    if (burstTimeoutRef.current !== null) window.clearTimeout(burstTimeoutRef.current);
+    if (bubbleTimeoutRef.current !== null) window.clearTimeout(bubbleTimeoutRef.current);
+    if (hintTimeoutRef.current !== null) window.clearTimeout(hintTimeoutRef.current);
     if (celebrationTimeoutRef.current !== null) window.clearTimeout(celebrationTimeoutRef.current);
   }, []);
-
-  const toggleSound = () => {
-    const nextMuted = !mutedRef.current;
-    mutedRef.current = nextMuted;
-    setMuted(nextMuted);
-    if (musicRef.current) {
-      if (nextMuted) musicRef.current.pause();
-      else void musicRef.current.play().catch(() => undefined);
-    }
-  };
 
   const handleHome = () => {
     stopPump();
@@ -151,12 +151,12 @@ const Aquaplay = () => {
       onPointerUp={stopPump}
       onPointerCancel={stopPump}
       onLostPointerCapture={stopPump}
-      aria-label={direction < 0 ? 'Apertar bomba esquerda' : 'Apertar bomba direita'}
+      aria-label={direction < 0 ? 'Bombear água pelo lado esquerdo' : 'Bombear água pelo lado direito'}
       aria-pressed={activePump === direction}
     >
-      <span className={styles.buttonSplash}>{direction < 0 ? '💦' : '🫧'}</span>
-      <span className={styles.buttonLabel}>{direction < 0 ? 'ESQUERDA' : 'DIREITA'}</span>
-      <span className={styles.buttonHint}>APERTE!</span>
+      <span className={styles.buttonIcon}>{direction < 0 ? '💦' : '🫧'}</span>
+      <span className={styles.buttonLabel}>{direction < 0 ? 'BOMBA ESQ.' : 'BOMBA DIR.'}</span>
+      <span className={styles.buttonHint}>TOQUE OU SEGURE</span>
     </button>
   );
 
@@ -164,60 +164,85 @@ const Aquaplay = () => {
 
   return (
     <main className={styles.game}>
-      <audio ref={musicRef} src="/music/happy.mp3" loop preload="auto" />
+      <img className={styles.sceneImage} src={SCENES[scene].src} alt="" />
+      <div className={styles.waterWash} />
+      <div className={styles.ambientBubbles} aria-hidden="true">
+        {Array.from({ length: 12 }, (_, index) => (
+          <i key={index} style={{ '--bubble-index': index } as CSSProperties} />
+        ))}
+      </div>
+
       <header className={styles.topBar}>
         <button className={styles.homeButton} onClick={handleHome} aria-label="Voltar ao parque">🏠</button>
         <div className={styles.brand}>
           <span className={styles.brandIcon}>🐠</span>
           <div>
             <h1>AQUAPLAY</h1>
-            <p>APERTE E FAÇA A MÁGICA! ✨</p>
+            <p>OCEANO DE ARGOLAS</p>
           </div>
         </div>
-        <div className={styles.topActions}>
-          <div className={styles.score} aria-live="polite">
-            <span>⭐</span>
-            <strong>{caughtInRound}/8</strong>
-          </div>
-          <button className={styles.soundButton} onClick={toggleSound} aria-label={muted ? 'Ativar sons e música' : 'Silenciar sons e música'}>
-            {muted ? '🔇' : '🔊'}
-          </button>
+        <div className={styles.score} aria-live="polite">
+          <span>⭐</span>
+          <strong>{caughtInRound}/8</strong>
         </div>
       </header>
 
+      <nav className={styles.scenePicker} aria-label="Escolher cenário">
+        {SCENES.map((item, index) => (
+          <button
+            key={item.src}
+            type="button"
+            className={scene === index ? styles.sceneActive : ''}
+            onClick={() => setScene(index)}
+            aria-label={'Cenário: ' + item.label}
+            aria-pressed={scene === index}
+          >
+            <span>{item.icon}</span>
+            <small>{item.label}</small>
+          </button>
+        ))}
+      </nav>
+
       <section className={styles.playArea} aria-label="Brinquedo Aquaplay">
         <div className={styles.tank}>
-          <div className={styles.tankShine} />
-          <div className={styles.waterSurface}><span /><span /><span /></div>
-          <div className={styles.sunRays}>☀️</div>
-          <div className={styles.target + ' ' + styles.targetLeft}><i /><span>⭐</span></div>
-          <div className={styles.target + ' ' + styles.targetRight}><i /><span>⭐</span></div>
+          <div className={styles.glassGlare} />
+          <div className={styles.waterLine}><i /><i /><i /></div>
+          <div className={[styles.target, styles.targetLeft].join(' ')}>
+            <span className={styles.targetHalo} />
+            <span className={styles.targetPost} />
+            <b>⭐</b>
+          </div>
+          <div className={[styles.target, styles.targetRight].join(' ')}>
+            <span className={styles.targetHalo} />
+            <span className={styles.targetPost} />
+            <b>⭐</b>
+          </div>
 
-          <div className={styles.fish + ' ' + styles.fishOne}>🐠</div>
-          <div className={styles.fish + ' ' + styles.fishTwo}>🐟</div>
-          <div className={styles.turtle}>🐢</div>
-          <div className={styles.jellyfish}>🪼</div>
-          <div className={styles.octopus}>🐙</div>
-          <div className={styles.dolphin}>🐬</div>
-          <div className={styles.seaweed}>🌿 🌿</div>
-          <div className={styles.coral}>🪸</div>
+          <div className={styles.depthGuide}>← MAIS PERTO <span>·</span> MAIS FUNDO →</div>
 
           {rings.map((ring) => (
             <div
               key={ring.id}
-              className={styles.ringSlot}
-              style={{ left: ring.x + '%', top: ring.y + '%' }}
+              className={[
+                styles.ringSlot,
+                ring.caught ? styles.ringCaught : '',
+                ring.missed ? styles.ringMissed : '',
+              ].join(' ')}
+              style={{
+                left: ring.x + '%',
+                top: ring.y + '%',
+                zIndex: Math.round(4 + ring.z * 4),
+                '--ring-color': ring.color,
+                '--ring-depth': ring.z,
+                '--ring-tilt': ring.tilt + 'deg',
+                '--ring-spin': ring.spin + 'deg',
+              } as CSSProperties}
             >
-              <div
-                className={styles.ring}
-                style={{
-                  borderColor: ring.color,
-                  transform: 'translate(-50%, -50%) rotate(' + ring.angle + 'deg)',
-                  opacity: ring.caught ? 1 : 0.98,
-                }}
-              >
+              <div className={styles.ring3d}>
+                <span className={styles.ringHole} />
                 {ring.caught && <span className={styles.ringSparkle}>✨</span>}
               </div>
+              {!ring.caught && <span className={styles.ringShadow} />}
             </div>
           ))}
 
@@ -226,33 +251,32 @@ const Aquaplay = () => {
               key={bubble.id}
               className={styles.burstBubble}
               style={{
-                left: (bubble.side < 0 ? 28 : 72) + '%',
+                left: (bubble.side < 0 ? 29 : 71) + '%',
                 '--bubble-offset': bubble.offset + 'px',
-                '--bubble-delay': (Math.abs(bubble.offset) / 120) + 's',
-              } as React.CSSProperties}
+                '--bubble-delay': (Math.abs(bubble.offset) / 160) + 's',
+              } as CSSProperties}
             />
           ))}
 
-          <div className={styles.floor} />
-          <div className={styles.tankLabel}>🌊 OCEANO DA DIVERSÃO 🌊</div>
+          <div className={styles.tankFrameBottom} />
           {celebrating && (
             <div className={styles.celebration}>
-              <div>🎉🐬🎉</div>
-              <strong>VOCÊ CONSEGUIU!</strong>
-              <span>As argolas encontraram seus lugares!</span>
-              <div className={styles.confetti}>⭐ 🫧 🐠 💖 🐙</div>
+              <div className={styles.celebrationAnimals}>🎉🐬🐠🎉</div>
+              <strong>VOCÊ DOMINOU O AQUÁRIO!</strong>
+              <span>As oito argolas encontraram seus aros!</span>
+              <div className={styles.confetti}>⭐ 🫧 🐚 💖 🐙</div>
             </div>
           )}
         </div>
       </section>
 
       <footer className={styles.controls}>
-        <div className={styles.controlHint}>SEGURE OS BOTÕES E VEJA A ÁGUA FAZER MÁGICA!</div>
+        <div className={styles.controlHint}>{hint}</div>
         <div className={styles.buttonRow}>
           {renderPump(-1)}
           {renderPump(1)}
         </div>
-        <div className={styles.footerMeta}>RODADA {round} <span>•</span> {caughtTotal} ARGOLAS NO TOTAL 🏆</div>
+        <div className={styles.footerMeta}>RODADA {round} <span>•</span> {caughtTotal} ARGOLAS ENCAIXADAS 🏆</div>
       </footer>
     </main>
   );

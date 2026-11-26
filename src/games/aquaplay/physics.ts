@@ -4,90 +4,170 @@ export type AquaRing = {
   id: number;
   x: number;
   y: number;
+  z: number;
   vx: number;
   vy: number;
-  angle: number;
+  vz: number;
+  tilt: number;
+  spin: number;
   target: 0 | 1;
   color: string;
   caught: boolean;
+  missed: boolean;
+};
+
+export type RingStep = {
+  rings: AquaRing[];
+  caughtIds: number[];
+  missedIds: number[];
 };
 
 export const TARGET_X: Record<0 | 1, number> = { 0: 28, 1: 72 };
+export const TARGET_Y = 25;
+export const TARGET_DEPTH = 0.5;
 
-const COLORS = ['#ff6b8a', '#ffd34e', '#6cceef', '#a88af7', '#65d89a', '#ff9b55', '#f07ed0', '#58cbb9'];
+const COLORS = [
+  '#ff6683', '#ffd34e', '#55d2f2', '#a88af7',
+  '#65d89a', '#ff9858', '#f07ed0', '#58cbb9',
+];
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 export function createInitialRings(): AquaRing[] {
   const starts = [
-    { x: 39, y: 67 }, { x: 62, y: 72 }, { x: 33, y: 77 }, { x: 67, y: 80 },
-    { x: 46, y: 83 }, { x: 56, y: 68 }, { x: 28, y: 74 }, { x: 73, y: 77 },
+    { x: 39, y: 70, z: 0.40 },
+    { x: 61, y: 73, z: 0.61 },
+    { x: 44, y: 79, z: 0.54 },
+    { x: 57, y: 68, z: 0.35 },
+    { x: 34, y: 82, z: 0.48 },
+    { x: 66, y: 80, z: 0.56 },
+    { x: 48, y: 74, z: 0.69 },
+    { x: 53, y: 84, z: 0.44 },
   ];
 
   return starts.map((start, id) => ({
     id,
-    x: start.x,
-    y: start.y,
+    ...start,
     vx: 0,
     vy: 0,
-    angle: (id % 4) * 9 - 13,
-    target: (id % 2) as 0 | 1,
+    vz: 0,
+    tilt: (id % 2 ? -1 : 1) * (4 + (id % 3) * 3),
+    spin: id % 2 ? 12 : -12,
+    target: start.x < 50 ? 0 : 1,
     color: COLORS[id],
     caught: false,
+    missed: false,
   }));
 }
 
-export function pumpRings(rings: AquaRing[], direction: PumpDirection): AquaRing[] {
+/**
+ * A pump creates a local water jet. It only pushes rings near that nozzle;
+ * there is no steering force pulling a ring toward a target.
+ */
+export function pumpRings(rings: AquaRing[], direction: PumpDirection, pulse = 0): AquaRing[] {
+  const nozzleX = direction < 0 ? 29 : 71;
+
   return rings.map((ring) => {
     if (ring.caught) return ring;
-    const targetDirection = ring.target === 0 ? -1 : 1;
-    const guidedPush = direction === targetDirection ? 25 : 11;
+
+    const distance = Math.abs(ring.x - nozzleX);
+    const reach = clamp(1 - distance / 38, 0, 1);
+    const depthFocus = clamp(1 - Math.abs(ring.z - TARGET_DEPTH) / 0.6, 0.28, 1);
+    const pressure = reach * depthFocus;
+    if (pressure < 0.08) return ring;
+
+    const waterKick = 0.76 + (pulse % 3) * 0.12;
+    const horizontalKick = direction * (9 + pressure * 18) * waterKick;
+    const verticalKick = (34 + pressure * 58) * waterKick;
+    const depthKick = (TARGET_DEPTH - ring.z) * pressure * 0.5;
+
     return {
       ...ring,
-      vx: clamp(ring.vx + direction * guidedPush, -76, 76),
-      vy: Math.max(-178, ring.vy - 112),
-      angle: ring.angle + direction * 7,
+      vx: clamp(ring.vx + horizontalKick, -88, 88),
+      vy: clamp(ring.vy - verticalKick, -170, 115),
+      vz: clamp(ring.vz + depthKick, -0.42, 0.42),
+      tilt: clamp(ring.tilt + direction * pressure * (8 + (pulse % 2) * 3), -48, 48),
+      spin: clamp(ring.spin + direction * pressure * 85, -280, 280),
     };
   });
 }
 
-export function stepRings(rings: AquaRing[], deltaSeconds: number): { rings: AquaRing[]; caughtIds: number[] } {
+/**
+ * Water drag slows the rings, buoyancy gently changes their depth,
+ * and gravity brings them back down. A point is awarded only on an
+ * upward crossing of the target plane with a narrow 3D alignment window.
+ */
+export function stepRings(rings: AquaRing[], deltaSeconds: number): RingStep {
   const dt = Math.min(Math.max(deltaSeconds, 0), 0.05);
   const caughtIds: number[] = [];
+  const missedIds: number[] = [];
 
   const nextRings = rings.map((ring) => {
     if (ring.caught) return ring;
 
-    const targetX = TARGET_X[ring.target];
-    const steering = (targetX - ring.x) * 1.05;
-    let vx = (ring.vx + steering * dt) * Math.exp(-1.15 * dt);
-    let vy = ring.vy + 82 * dt;
+    const previousY = ring.y;
+    let vx = ring.vx * Math.exp(-0.72 * dt);
+    let vy = (ring.vy + 76 * dt) * Math.exp(-0.06 * dt);
+    let vz = (ring.vz + (TARGET_DEPTH - ring.z) * 0.52 * dt) * Math.exp(-1.15 * dt);
     let x = ring.x + vx * dt;
     let y = ring.y + vy * dt;
-    const angle = ring.angle + vx * dt * 0.42;
+    let z = ring.z + vz * dt;
+    let tilt = ring.tilt * Math.exp(-1.05 * dt);
+    let spin = ring.spin * Math.exp(-0.9 * dt);
+    let missed = ring.missed;
 
-    if (x < 9 || x > 91) {
-      x = clamp(x, 9, 91);
-      vx *= -0.42;
+    if (x < 7 || x > 93) {
+      x = clamp(x, 7, 93);
+      vx *= -0.48;
+    }
+    if (z < 0.08 || z > 0.92) {
+      z = clamp(z, 0.08, 0.92);
+      vz *= -0.38;
     }
 
-    const targetY = 22 + (ring.id % 2) * 2;
-    if (y <= 28 && vy < 0 && Math.abs(x - targetX) <= 15) {
-      caughtIds.push(ring.id);
-      return { ...ring, x: targetX, y: targetY, vx: 0, vy: 0, caught: true };
+    const crossedTargetPlane = previousY > TARGET_Y && y <= TARGET_Y && vy < 0;
+    if (crossedTargetPlane && !missed) {
+      const targetX = TARGET_X[ring.target];
+      const alignedX = Math.abs(x - targetX) <= 4.8;
+      const alignedDepth = Math.abs(z - TARGET_DEPTH) <= 0.13;
+      const alignedTilt = Math.abs(tilt) <= 15;
+      const controlledSpeed = vy >= -138 && Math.abs(vx) <= 62;
+
+      if (alignedX && alignedDepth && alignedTilt && controlledSpeed) {
+        caughtIds.push(ring.id);
+        return {
+          ...ring,
+          x: targetX,
+          y: TARGET_Y,
+          z: TARGET_DEPTH,
+          vx: 0,
+          vy: 0,
+          vz: 0,
+          tilt: 0,
+          spin: 0,
+          caught: true,
+          missed: false,
+        };
+      }
+
+      missed = true;
+      missedIds.push(ring.id);
     }
+
+    if (missed && y > TARGET_Y + 13 && vy > 0) missed = false;
 
     if (y < 5) {
-      y = 76;
+      y = 5;
+      vy = Math.max(34, Math.abs(vy) * 0.5);
+      tilt *= 0.7;
+    } else if (y > 89) {
+      y = 89;
       vy = 0;
-      vx *= 0.35;
-    } else if (y > 87) {
-      y = 87;
-      vy = 0;
-      vx *= 0.9;
+      vx *= 0.78;
+      spin *= 0.8;
     }
 
-    return { ...ring, x, y, vx, vy, angle };
+    return { ...ring, x, y, z, vx, vy, vz, tilt, spin, missed };
   });
 
-  return { rings: nextRings, caughtIds };
+  return { rings: nextRings, caughtIds, missedIds };
 }
