@@ -6,7 +6,6 @@ import {
   createInitialRings,
   pumpRings,
   stepRings,
-  type AquaRing,
   type PumpDirection,
 } from '../../games/aquaplay/physics';
 
@@ -163,7 +162,7 @@ const Aquaplay = () => {
   const caughtInRound = rings.filter((ring) => ring.caught).length;
 
   return (
-    <main className={styles.game}>
+    <main className={styles.game} data-game="aquaplay">
       <img className={styles.sceneImage} src={SCENES[scene].src} alt="" />
       <div className={styles.waterWash} />
       <div className={styles.ambientBubbles} aria-hidden="true">
@@ -234,6 +233,7 @@ const Aquaplay = () => {
                 zIndex: Math.round(4 + ring.z * 4),
                 '--ring-color': ring.color,
                 '--ring-depth': ring.z,
+                '--ring-scale': String(0.76 + ring.z * 0.42),
                 '--ring-tilt': ring.tilt + 'deg',
                 '--ring-spin': ring.spin + 'deg',
               } as CSSProperties}
