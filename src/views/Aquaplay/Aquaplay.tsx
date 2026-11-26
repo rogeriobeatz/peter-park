@@ -33,8 +33,15 @@ const Aquaplay = () => {
   const burstTimeoutRef = useRef<number | null>(null);
   const celebrationTimeoutRef = useRef<number | null>(null);
   const bubbleIdRef = useRef(0);
+  const musicRef = useRef<HTMLAudioElement>(null);
 
-  mutedRef.current = muted;
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
+
+  useEffect(() => {
+    if (musicRef.current) musicRef.current.volume = 0.12;
+  }, []);
 
   const resetRound = useCallback(() => {
     const fresh = createInitialRings();
@@ -55,7 +62,10 @@ const Aquaplay = () => {
     if (burstTimeoutRef.current !== null) window.clearTimeout(burstTimeoutRef.current);
     burstTimeoutRef.current = window.setTimeout(() => setBubbles([]), 850);
 
-    if (!mutedRef.current) playPopSound(direction < 0 ? 390 : 520);
+    if (!mutedRef.current) {
+      if (musicRef.current?.paused) void musicRef.current.play().catch(() => undefined);
+      playPopSound(direction < 0 ? 390 : 520);
+    }
   }, []);
 
   const startPump = (direction: PumpDirection, event: PointerEvent<HTMLButtonElement>) => {
@@ -114,6 +124,16 @@ const Aquaplay = () => {
     if (celebrationTimeoutRef.current !== null) window.clearTimeout(celebrationTimeoutRef.current);
   }, []);
 
+  const toggleSound = () => {
+    const nextMuted = !mutedRef.current;
+    mutedRef.current = nextMuted;
+    setMuted(nextMuted);
+    if (musicRef.current) {
+      if (nextMuted) musicRef.current.pause();
+      else void musicRef.current.play().catch(() => undefined);
+    }
+  };
+
   const handleHome = () => {
     stopPump();
     window.dispatchEvent(new CustomEvent('peterpark:back'));
@@ -144,6 +164,7 @@ const Aquaplay = () => {
 
   return (
     <main className={styles.game}>
+      <audio ref={musicRef} src="/music/happy.mp3" loop preload="auto" />
       <header className={styles.topBar}>
         <button className={styles.homeButton} onClick={handleHome} aria-label="Voltar ao parque">🏠</button>
         <div className={styles.brand}>
@@ -158,7 +179,7 @@ const Aquaplay = () => {
             <span>⭐</span>
             <strong>{caughtInRound}/8</strong>
           </div>
-          <button className={styles.soundButton} onClick={() => setMuted((value) => !value)} aria-label={muted ? 'Ativar sons' : 'Silenciar sons'}>
+          <button className={styles.soundButton} onClick={toggleSound} aria-label={muted ? 'Ativar sons e música' : 'Silenciar sons e música'}>
             {muted ? '🔇' : '🔊'}
           </button>
         </div>
