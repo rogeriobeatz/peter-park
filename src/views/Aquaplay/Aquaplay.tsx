@@ -6,6 +6,7 @@ import {
   createInitialRings,
   pumpRings,
   stepRings,
+  type AquaRing,
   type PumpDirection,
 } from '../../games/aquaplay/physics';
 
