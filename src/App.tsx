@@ -9,6 +9,7 @@ import NumbersGame from './views/NumbersGame';
 import MusicGame from './views/MusicGame/MusicGame';
 import WhackGame from './views/WhackGame';
 import GyroMaze from './views/GyroMaze/GyroMaze';
+import TeiaTurbo from './views/TeiaTurbo/TeiaTurbo';
 import BackgroundMusic from './components/BackgroundMusic';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
       case 'musica': return <MusicGame />;
       case 'smak': return <WhackGame />;
       case 'labirinto': return <GyroMaze />;
+      case 'teia-turbo': return <TeiaTurbo />;
       default: return <div className="unknown-game">Em breve: {activeGame}</div>;
     }
   };
@@ -40,7 +42,7 @@ function App() {
       <BackgroundMusic />
       {!activeGame ? <Park onSelectGame={setActiveGame} /> : (
         <div className="game-wrapper">
-          {activeGame !== 'labirinto' && <header className="game-home-header">
+          {!['labirinto', 'teia-turbo'].includes(activeGame) && <header className="game-home-header">
             <button className="bouncy-tap" onClick={() => setActiveGame(null)} aria-label="Voltar ao parque">🏠</button>
           </header>}
           {renderGame()}

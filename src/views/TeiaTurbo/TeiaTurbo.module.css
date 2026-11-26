@@ -1,0 +1,40 @@
+.game{position:relative;width:100%;height:100%;min-height:0;overflow:hidden;background:#72cfff;touch-action:none;color:#17466d}
+.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;z-index:2;top:calc(8px + env(safe-area-inset-top));left:calc(10px + env(safe-area-inset-left));right:calc(10px + env(safe-area-inset-right));display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none}
+.home,.score{height:clamp(40px,8vh,54px);min-width:clamp(44px,8vh,54px);border:3px solid #fff;border-radius:18px;background:#ffffffed;box-shadow:0 4px 0 #3479a6;font-size:clamp(20px,4vh,29px);pointer-events:auto}
+.title{padding:7px 18px;border:3px solid #fff;border-radius:999px;background:#ffcf46;box-shadow:0 4px 0 #d89b26;color:#78451d;font-size:clamp(14px,2.5vw,23px);font-weight:900;letter-spacing:.06em;text-shadow:0 1px #fff}
+.score{display:flex;align-items:center;justify-content:center;padding:0 12px;color:#a75c00;font-weight:900;font-size:clamp(17px,3vh,24px)}
+.sensorHint{position:absolute;z-index:2;left:50%;top:calc(68px + env(safe-area-inset-top));transform:translateX(-50%);max-width:70%;padding:6px 13px;border:2px solid #ffffffc9;border-radius:999px;background:#ffffffc9;color:#285b7b;text-align:center;font-size:clamp(10px,1.6vw,14px);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.controls{position:absolute;z-index:3;right:calc(16px + env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px}
+.controls button{width:clamp(40px,7vh,58px);height:clamp(40px,7vh,58px);border:3px solid #fff;border-radius:18px;background:#ffffffd9;color:#28619a;box-shadow:0 4px 0 #4984ae;font-size:clamp(20px,3.5vh,28px);touch-action:none}
+.controls button:active{transform:translateY(3px);box-shadow:0 1px 0 #4984ae}
+.intro{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:calc(12px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));background:#14527a4d;backdrop-filter:blur(3px)}
+.introCard{width:min(560px,92vw);max-height:94%;overflow:auto;padding:clamp(16px,3vh,26px) clamp(18px,4vw,34px);border:5px solid #fff;border-radius:30px;background:linear-gradient(160deg,#fff 0%,#fff8d9 100%);box-shadow:0 8px 0 #3479a6,0 18px 40px #17466d55;text-align:center}
+.heroBadge{font-size:clamp(38px,8vh,66px);line-height:1.1;filter:drop-shadow(0 4px 0 #d8eaf4)}
+.kicker{margin:5px 0;color:#e66c54;font-size:clamp(9px,1.4vw,12px);font-weight:900;letter-spacing:.13em}
+.introCard h1{margin:2px 0 7px;color:#1763a3;font-size:clamp(27px,6vh,48px);line-height:1;text-shadow:2px 3px 0 #d7efff}
+.introCard>p:not(.kicker){max-width:430px;margin:7px auto 12px;color:#496d82;font-size:clamp(12px,2.1vh,17px);line-height:1.35}
+.instructions{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:10px 0 14px}
+.instructions span{padding:7px 10px;border-radius:999px;background:#e4f5ff;color:#275d82;font-size:clamp(10px,1.6vh,13px);font-weight:700}
+.playButton{min-width:190px;padding:12px 24px;border:0;border-radius:999px;background:linear-gradient(#ffdc56,#ffb82e);box-shadow:0 5px 0 #d88d20;color:#704416;font-size:clamp(17px,3vh,23px);font-weight:900}
+.playButton:active{transform:translateY(4px);box-shadow:0 1px 0 #d88d20}
+.introCard small{display:block;margin-top:10px;color:#7290a2;font-size:11px}
+.landscapePrompt{display:none}
+@media (orientation:portrait) and (max-width:900px){
+  .landscapePrompt{position:absolute;z-index:8;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;background:linear-gradient(160deg,#75d7ff,#d9f6ff);color:#155782;text-align:center}
+  .landscapePrompt div{font-size:64px;animation:turnPhone 2s ease-in-out infinite}
+  .landscapePrompt strong{font-size:clamp(23px,6vw,34px)}
+  .landscapePrompt span{max-width:280px;font-size:16px}
+}
+@media (max-height:430px) and (orientation:landscape){
+  .sensorHint{top:calc(55px + env(safe-area-inset-top));padding:4px 10px}
+  .introCard{padding:10px 22px;border-width:3px;border-radius:22px}
+  .heroBadge{font-size:36px}
+  .introCard h1{font-size:28px}
+  .introCard>p:not(.kicker){margin:5px auto;font-size:12px}
+  .instructions{margin:5px 0 8px}
+  .instructions span{padding:5px 8px}
+  .playButton{padding:8px 20px;font-size:17px}
+  .introCard small{margin-top:5px}
+}
+@keyframes turnPhone{0%,100%{transform:rotate(0)}50%{transform:rotate(90deg)}}
