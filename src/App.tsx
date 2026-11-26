@@ -41,7 +41,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <BackgroundMusic />
+      {activeGame !== 'aquaplay' && <BackgroundMusic />}
       {!activeGame ? <Park onSelectGame={setActiveGame} /> : (
         <div className="game-wrapper">
           {!['labirinto', 'teia-turbo', 'aquaplay'].includes(activeGame) && <header className="game-home-header">
