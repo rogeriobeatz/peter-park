@@ -169,11 +169,11 @@ const Aquaplay = () => {
           <div className={styles.tankShine} />
           <div className={styles.waterSurface}><span /><span /><span /></div>
           <div className={styles.sunRays}>☀️</div>
-          <div className={styles.target targetLeft}><i /><span>⭐</span></div>
-          <div className={styles.target targetRight}><i /><span>⭐</span></div>
+          <div className={styles.target + ' ' + styles.targetLeft}><i /><span>⭐</span></div>
+          <div className={styles.target + ' ' + styles.targetRight}><i /><span>⭐</span></div>
 
-          <div className={styles.fish fishOne}>🐠</div>
-          <div className={styles.fish fishTwo}>🐟</div>
+          <div className={styles.fish + ' ' + styles.fishOne}>🐠</div>
+          <div className={styles.fish + ' ' + styles.fishTwo}>🐟</div>
           <div className={styles.turtle}>🐢</div>
           <div className={styles.jellyfish}>🪼</div>
           <div className={styles.octopus}>🐙</div>
