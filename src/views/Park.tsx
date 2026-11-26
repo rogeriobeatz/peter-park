@@ -16,6 +16,7 @@ const GAMES = [
   { id: 'musica', title: 'Banda', icon: '🎸', color: '#A78BFA' },
   { id: 'smak', title: 'Sopa Mágica', icon: '🍲', color: '#F87171' },
   { id: 'labirinto', title: 'Labirinto', icon: '🌀', color: '#7DD3FC' },
+  { id: 'teia-turbo', title: 'Teia Turbo', icon: '🕸️', color: '#F87171' },
 ];
 
 const Park: React.FC<ParkProps> = ({ onSelectGame }) => {
